@@ -1,12 +1,7 @@
 github_users:
-  - torvalds
-  - alshedivat
+  - sabilmakbar
 
 github_repos:
-  - alshedivat/al-folio
-  - twbs/bootstrap
-  - jekyll/jekyll
-  - jquery/jquery
-  - FortAwesome/Font-Awesome
-  - jpswalsh/academicons
-  - mathjax/MathJax
+  - sabilmakbar/yt_idsub_generator
+  - indonlp/nusa-writes
+  - sabilmakbar/id_nnsplit_train
