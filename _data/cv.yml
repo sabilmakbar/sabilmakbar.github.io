@@ -2,96 +2,93 @@
   type: map
   contents:
     - name: Full Name
-      value: Albert Einstein
-    - name: Date of Birth
-      value: 14th March 1879
-    - name: Languages
-      value: English, German
+      value: Salsabil Maulana Akbar
+    - name: Title
+      value: Data Scientist @ Tokopedia | NLP & IR
 
 - title: Education
   type: time_table
   contents:
-    - title: PhD
-      institution: University of Zurich, Zurich, Switzerland
-      year: 1905
+    - title: Bachelor of Mathematics
+      institution: Bandung Institute of Technology (ITB)
+      year: 2016 - 2020
       description:
-        - Description 1.
-        - Description 2.
-        - title: Description 3.
+        - Focus Area in Applied Mathematics (Optimization, PDE, Financial Mathametics)
+        - Learnt Core Math Study (i.e Linear Algebra, Real & Complex Analysis, Multivariable Calculus)
+        - Took intermediate Statistics Courses as well (Probability Theory, Mathematical Statistics)
+        - title: Activities
           contents:
-            - Sub-description 1.
-            - Sub-description 2.
-    - title: Federal teaching diploma
-      institution: Eidgenössische Technische Hochschule, Zurich, Switzerland
-      year: 1900
-      description:
-        - Description 1.
-        - Description 2.
+            - Took International Modeling Competition on Fish Dyamics over course of time
+            - Participated in Quantitative Finance (Quant) Portfolio Construction Challenge
 
 - title: Experience
   type: time_table
   contents:
-    - title: Professor of Theoretical Physics
-      institution: Institute for Advanced Study, Princeton University
-      year: 1933 - 1955
-      description:
-        - Description 1.
-        - Description 2.
-        - title: Description 3.
-          contents:
-            - Sub-description 1.
-            - Sub-description 2.
-    - title: Visiting Professor
-      institution: California Institute of Technology, Pasadena, California, US
-      year: 1933
-      description:
-        - Description 1.
-        - Description 2.
-
-    - title: Director
-      institution: Kaiser Wilhelm Institute for Physics, Berlin, Germany.
-      year: 1917-1933
-
-    - title: Professor of Theoretical Physics
-      institution: Karl-Ferdinand University, Prague, Czechoslovakia
-      year: 1911 - 1917
-      description:
-
-    - title: Associate Professor of Theoretical Physics
-      institution: University of Zurich, Zurich, Switzerland
-      year: 1909 - 1911
+    - title: Data Scientist (Search)
+      institution: Tokopedia
+      year: 2021 (Sep) - current
+      # description:
+      #   - Description 1.
+      #   - Description 2.
+      #   - title: Description 3.
+      #     contents:
+      #       - Sub-description 1.
+      #       - Sub-description 2.
+    - title: Data Scientist
+      institution: Pashouses
+      year: 2020 (Nov) - 2021 (Sep)
+      # description:
+      #   - Description 1.
+      #   - Description 2.
 
 - title: Open Source Projects
   type: time_table
   contents:
-    - title: <a href="https://github.com/alshedivat/al-folio">al-folio</a>
-      year: 2015-now
-      description: A beautiful, simple, clean, and responsive Jekyll theme for academics.
+    - title: <a href="https://github.com/sabilmakbar/yt_idsub_generator">ID ASR Dataset Generator</a>
+      year: 2023
+      description:
+        - "A construction of v0 Indonesia language ASR-based (Automatic Subtitle Recognition) Dataset on News Channel videos"
+        - "Created end-to-end ETL Pipeline (will be dockerized)"
+        - "Used <u>langdetect</u> module for automated subtitle cleansing (inspired from C4 data construction)."
+        - "<b>Keywords: ETL Pipeline, Text Processing, NLP Dataset.</b>"
+    - title: <a href="https://github.com/sabilmakbar/yt_idsub_generator">ID NN-based Splitter</a>
+      year: 2023
+      description:
+        - Forked from this repo <a href="https://github.com/bminixhofer/wtpsplit">WTSplit, previously NNSplit</a> and readjusted its codebase to Indo Data
 
-- title: Honors and Awards
-  type: time_table
-  contents:
-    - year: 1921
-      items: 
-        - Nobel Prize in Physics 
-        - Matteucci Medal
-    - year: 2029
-      items: 
-        - Max Planck Medal
+# - title: Honors and Awards
+#   type: time_table
+#   contents:
+#     - year: 1921
+#       items: 
+#         - Nobel Prize in Physics 
+#         - Matteucci Medal
+#     - year: 2029
+#       items: 
+#         - Max Planck Medal
 
 - title: Academic Interests
   type: nested_list
   contents:
-    - title: Topic 1.
-      items: 
-        - Description 1.
-        - Description 2.
-    - title: Topic 2.
+    - title: Advancing NLP latest models to Indonesian & its local languages
       items:
-        - Description 1.
-        - Description 2.
+        - LLM are known to perform poorly in low-resource languages, due to diminishing data volume
+        - In addition, some resources of local languages in Indonesia aren't being exploited yet in latest NLP advancement
+        - Hence, I'm contributing on a project (with several masterful folks from Indonesia) in carrying this mission
+    - title: NLP Generic Toolkit Expansion
+      items:
+        - "Motivation: Some of the most used NLP toolkits isn't available in Indonesia, yet in its local languages"
+        - Hence, I'd like to partake in this mission to democratize the tool & knowledge across languages
+    - title: Low-resource NLP Research
+      items:
+        - There are some Low-resource Languages in Indonesia that is syntacticly transferrable w/o significant semantic degradation from Indonesian languages
+        - Hence, I'm dedicated to devote on bridging NLP into low-resource languages by this approach
+        - My aspiration also includes attending higher degree education in a environment such that it will enables me on driving this vision
 
 - title: Other Interests
   type: list
   contents:
-    - <u>Hobbies:</u> Hobby 1, Hobby 2, etc.
+    - Cracking Math Problems (at times I'm longing for a challenge for proving/disproving a Math statement)
+    - Learning to code tidily and in self-explainable manner (since I'm not a CS person during college years, I have to push myself by doing self-learning)
+    - Doing a truly end-to-end deployment from the scratch, by my own hands (however I may be assisted by Stackoverflow or ChatGPT)
+    - Discovering Mathamatics beauty as a "language" in real-life domain (be it in DS, ML, and AI or in Social Science)
