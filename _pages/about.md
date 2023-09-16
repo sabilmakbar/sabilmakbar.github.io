@@ -6,7 +6,7 @@ subtitle: Mathematics, ITB | Tokopedia | Search | NLP & Information Retrieval
 
 profile:
   align: right
-  image: no_image.png
+  image: pp_github.png
   image_circular: false # crops the image to make it circular
   address: >
     <p>Jakarta, Indonesia</p>
