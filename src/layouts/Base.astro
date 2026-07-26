@@ -1,0 +1,140 @@
+---
+import "../styles/global.css";
+import { profile, nav } from "../data/profile";
+import ChatWidget from "../components/ChatWidget.astro";
+
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} · ${profile.short}` : `${profile.name} · ${profile.tagline}`;
+const desc = description ?? profile.blurb;
+const path = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- set theme before paint to avoid a flash -->
+    <script is:inline>
+      (function () {
+        const t = localStorage.getItem("theme");
+        const dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.classList.toggle("dark", dark);
+      })();
+    </script>
+  </head>
+
+  <body class="min-h-screen flex flex-col">
+    <header class="sticky top-0 z-40 border-b border-border bg-bg/80 backdrop-blur">
+      <nav class="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
+        <a href="/" class="group flex flex-col leading-none">
+          <span class="font-display font-bold tracking-tight text-fg group-hover:text-accent transition-colors">
+            {profile.brand}<span class="text-accent">.</span>
+          </span>
+          <span class="mt-1 hidden font-mono text-[10px] uppercase tracking-wider text-muted sm:block">
+            {profile.brandTag}
+          </span>
+        </a>
+        <div class="flex items-center gap-2">
+          <div class="hidden items-center gap-1 sm:flex">
+            {nav.map((item) => {
+              const active = item.href === "/" ? path === "/" : path.startsWith(item.href);
+              return (
+                <a
+                  href={item.href}
+                  class:list={[
+                    "rounded-md px-2.5 py-1.5 text-sm transition-colors hover:text-accent",
+                    active ? "text-accent font-medium" : "text-muted",
+                  ]}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
+          </div>
+          <button
+            id="theme-toggle"
+            aria-label="Toggle dark mode"
+            class="rounded-md border border-border p-1.5 text-muted hover:text-accent hover:border-accent transition-colors"
+          >
+            <svg class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.36 6.36l-.7-.7M6.34 6.34l-.7-.7m12.72 0l-.7.7M6.34 17.66l-.7.7"/><circle cx="12" cy="12" r="4"/></svg>
+            <svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <button
+            id="nav-toggle"
+            aria-label="Toggle menu"
+            aria-expanded="false"
+            class="rounded-md border border-border p-1.5 text-muted transition-colors hover:border-accent hover:text-accent sm:hidden"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- mobile menu -->
+      <div id="mobile-menu" class="hidden border-t border-border sm:hidden">
+        <div class="mx-auto flex max-w-4xl flex-col px-4 py-2">
+          {nav.map((item) => {
+            const active = item.href === "/" ? path === "/" : path.startsWith(item.href);
+            return (
+              <a
+                href={item.href}
+                class:list={[
+                  "rounded-md px-3 py-2.5 text-sm transition-colors hover:bg-surface",
+                  active ? "text-accent font-medium" : "text-fg",
+                ]}
+              >
+                {item.label}
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto w-full max-w-4xl flex-1 px-6 py-12 sm:py-16">
+      <slot />
+    </main>
+
+    <footer class="border-t border-border">
+      <div class="mx-auto flex max-w-4xl flex-col gap-2 px-6 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
+        <span>© {new Date().getFullYear()} {profile.name}</span>
+        <div class="flex gap-4">
+          {profile.social.map((s) => (
+            <a href={s.href} class="hover:text-accent transition-colors" rel="me noopener" target="_blank">{s.label}</a>
+          ))}
+        </div>
+      </div>
+    </footer>
+
+    <ChatWidget />
+
+    <script is:inline>
+      document.getElementById("theme-toggle")?.addEventListener("click", () => {
+        const dark = document.documentElement.classList.toggle("dark");
+        localStorage.setItem("theme", dark ? "dark" : "light");
+      });
+      const navToggle = document.getElementById("nav-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
+      navToggle?.addEventListener("click", () => {
+        const open = mobileMenu.classList.toggle("hidden") === false;
+        navToggle.setAttribute("aria-expanded", String(open));
+      });
+      // close the menu after tapping a link
+      mobileMenu?.querySelectorAll("a").forEach((a) =>
+        a.addEventListener("click", () => mobileMenu.classList.add("hidden")),
+      );
+    </script>
+  </body>
+</html>

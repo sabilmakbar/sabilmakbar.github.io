@@ -1,40 +1,39 @@
-name: deploy
+name: Build & deploy site
 
 on:
   push:
-    branches:
-      - master
-      - main
-  pull_request:
-    branches:
-      - master
-      - main
-  workflow_dispatch:
+    branches: [master]
+  workflow_dispatch: {}      # allows manual "Run workflow"
+  schedule:
+    - cron: "0 6 * * 1"      # weekly (Mon 06:00 UTC) — refreshes auto-fetched repo data
 
 permissions:
-  contents: write
+  contents: write            # to push the built site to gh-pages
+
+concurrency:
+  group: deploy-pages
+  cancel-in-progress: true
 
 jobs:
-  deploy:
-    # available images: https://github.com/actions/runner-images#available-images
+  build-deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout 🛎️
-      uses: actions/checkout@v3
-    - name: Setup Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2.2'
-        bundler-cache: true
-    - name: Install and Build 🔧
-      run: |
-        pip3 install --upgrade jupyter
-        npm install -g mermaid.cli
-        export JEKYLL_ENV=production
-        bundle exec jekyll build
-    - name: Deploy 🚀
-      if: github.event_name != 'pull_request'
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        folder: _site
+      - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          # used by src/pages/repositories.astro to raise the GitHub API rate limit
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages

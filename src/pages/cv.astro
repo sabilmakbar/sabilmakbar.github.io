@@ -1,0 +1,75 @@
+---
+import Base from "../layouts/Base.astro";
+import { education, experience, projects, academicInterests, otherInterests } from "../data/cv";
+
+const timeline = [
+  { heading: "Experience", items: experience },
+  { heading: "Education", items: education },
+  { heading: "Open-source projects", items: projects },
+];
+---
+
+<Base title="Resume" description="Resume of Salsabil Maulana Akbar: education, experience, and interests.">
+  <header class="mb-10">
+    <p class="eyebrow mb-2">Curriculum vitae</p>
+    <h1 class="text-3xl font-bold sm:text-4xl">Resume</h1>
+  </header>
+
+  {timeline.map((section) => (
+    <section class="mb-12">
+      <h2 class="mb-5 font-display text-lg font-semibold">{section.heading}</h2>
+      <div class="space-y-6">
+        {section.items.map((it: any) => (
+          <div class="border-l border-border pl-5">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+              <h3 class="font-display font-semibold">
+                {it.href ? (
+                  <a href={it.href} target="_blank" rel="noopener" class="hover:text-accent transition-colors">{it.title}</a>
+                ) : (
+                  it.title
+                )}
+              </h3>
+              <span class="font-mono text-xs text-muted">{it.year}</span>
+            </div>
+            {it.org && <p class="text-sm text-accent">{it.org}</p>}
+            {it.points && (
+              <ul class="mt-2 space-y-1 text-sm text-fg/90">
+                {it.points.map((p: string) => (
+                  <li class="flex gap-2">
+                    <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-muted"></span>
+                    <span set:html={p} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <section class="mb-12">
+    <h2 class="mb-5 font-display text-lg font-semibold">Academic interests</h2>
+    <div class="space-y-5">
+      {academicInterests.map((a) => (
+        <div class="border-l border-border pl-5">
+          <h3 class="font-display font-semibold">{a.title}</h3>
+          <ul class="mt-2 space-y-1 text-sm text-fg/90">
+            {a.items.map((i) => (
+              <li class="flex gap-2"><span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-muted"></span>{i}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="mb-5 font-display text-lg font-semibold">Other interests</h2>
+    <ul class="space-y-2 text-sm text-fg/90">
+      {otherInterests.map((i) => (
+        <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span><span set:html={i} /></li>
+      ))}
+    </ul>
+  </section>
+</Base>
