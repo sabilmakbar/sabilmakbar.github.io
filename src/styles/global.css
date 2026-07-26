@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+/* manual dark mode via .dark on <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---- design tokens ---------------------------------------------------- */
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", var(--font-sans);
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* semantic colors resolve to the CSS vars below (which flip in dark mode) */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+}
+
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --fg: #18181b;
+  --muted: #57534e;
+  --border: #e7e5e4;
+  --accent: #0d9488;      /* teal: confident, technical, not the generic AI purple */
+  --accent-fg: #ffffff;
+}
+
+.dark {
+  --bg: #0b0c0e;
+  --surface: #141619;
+  --fg: #e8e8ea;
+  --muted: #a1a1aa;
+  --border: #26272b;
+  --accent: #2dd4bf;
+  --accent-fg: #0b0c0e;
+}
+
+/* ---- base ------------------------------------------------------------- */
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  ::selection { background: var(--accent); color: var(--accent-fg); }
+  a { text-underline-offset: 3px; }
+}
+
+/* monospace eyebrow label */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
