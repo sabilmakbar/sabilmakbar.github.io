@@ -47,6 +47,14 @@ repo_trophies:
 rss_icon: false
 
 # -----------------------------------------------------------------------------
+# Profile QA chat widget (open-source RAG backend)
+# -----------------------------------------------------------------------------
+profile_qa:
+  enabled: true
+  # Backend URL — the Cloudflare Worker (open-source RAG engine on Workers AI).
+  endpoint: "https://profile-qa-cf.maulana-1998.workers.dev"
+
+# -----------------------------------------------------------------------------
 # Layout
 # -----------------------------------------------------------------------------
 
