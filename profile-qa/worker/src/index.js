@@ -13,11 +13,21 @@ const GEN_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8";
 const TOP_K = 5;
 const ALPHA = 0.5; // weight on dense; (1 - ALPHA) on BM25
 
-const ALLOWED_ORIGINS = new Set([
+// Browser origins allowed to call this worker. Override per deployment with the
+// ALLOWED_ORIGINS var in wrangler.toml (comma-separated), so a fork changes
+// config rather than code. localhost entries are relative to whoever is running
+// the dev server, so they work for anyone without naming a specific machine.
+const DEFAULT_ALLOWED_ORIGINS = [
   "https://sabilmakbar.github.io",
-  "http://localhost:4000",
-  "http://127.0.0.1:4000",
-]);
+  "http://localhost:4321",
+  "http://127.0.0.1:4321",
+];
+
+function allowedOrigins(env) {
+  const raw = (env.ALLOWED_ORIGINS || "").trim();
+  if (!raw) return new Set(DEFAULT_ALLOWED_ORIGINS);
+  return new Set(raw.split(",").map((s) => s.trim()).filter(Boolean));
+}
 
 const SYSTEM_PROMPT =
   "You are a helpful assistant that answers questions about Salsabil Maulana " +
@@ -27,6 +37,9 @@ const SYSTEM_PROMPT =
   "guessing. You MAY compute simple date-based facts (for example, years of " +
   "experience or how long a role lasted) from the dates in the context together " +
   "with today's date given below; treat a role marked 'present' as ending today. " +
+  "Distinguish clearly between what he has done professionally and what the context " +
+  "labels as an interest or a direction he is exploring; never describe an interest " +
+  "or aspiration as professional experience. " +
   "Be concise, factual, and speak about him in the third person.";
 
 // ---- embeddings ---------------------------------------------------------
@@ -85,14 +98,55 @@ const minmax = (xs) => {
   return hi > lo ? xs.map((x) => (x - lo) / (hi - lo)) : xs.map(() => 0);
 };
 
-function corsHeaders(origin) {
+function corsHeaders(origin, allowed) {
   const h = { "Content-Type": "application/json" };
-  if (ALLOWED_ORIGINS.has(origin)) {
+  if (allowed.has(origin)) {
     h["Access-Control-Allow-Origin"] = origin;
     h["Access-Control-Allow-Methods"] = "POST, OPTIONS";
     h["Access-Control-Allow-Headers"] = "Content-Type";
   }
   return h;
+}
+
+// ---- rate limiting -------------------------------------------------------
+// Counts recent requests per caller in D1. Two windows: a short burst guard and
+// an hourly cap, so one visitor cannot drain the shared free AI quota.
+const RATE_LIMITS = [
+  { seconds: 60, max: 8, kind: "burst" },
+  { seconds: 3600, max: 40, kind: "hourly" },
+];
+
+// Identify the caller without storing an IP: hash it with a daily salt.
+async function callerKey(request) {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const day = new Date().toISOString().slice(0, 10);
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${day}:${ip}`));
+  return [...new Uint8Array(buf)].slice(0, 12).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Returns null when allowed, or {kind, retryAfter} when the caller is over.
+async function checkRateLimit(env, key) {
+  if (!env.DB) return null;
+  const now = Date.now();
+  try {
+    for (const limit of RATE_LIMITS) {
+      const since = new Date(now - limit.seconds * 1000).toISOString();
+      const row = await env.DB
+        .prepare("SELECT COUNT(*) AS n FROM rate_hit WHERE key = ? AND ts > ?")
+        .bind(key, since)
+        .first();
+      if ((row?.n ?? 0) >= limit.max) {
+        return { kind: limit.kind, retryAfter: limit.seconds };
+      }
+    }
+    await env.DB
+      .prepare("INSERT INTO rate_hit (key, ts) VALUES (?, ?)")
+      .bind(key, new Date(now).toISOString())
+      .run();
+  } catch (e) {
+    console.error("rate limit check failed, allowing:", e); // fail open
+  }
+  return null;
 }
 
 // Log one Q&A to D1. Best-effort: never throws into the request path.
@@ -111,7 +165,8 @@ async function logQA(env, row) {
 export default {
   async fetch(request, env, ctx) {
     const origin = request.headers.get("Origin") || "";
-    const headers = corsHeaders(origin);
+    const allowed = allowedOrigins(env);
+    const headers = corsHeaders(origin, allowed);
 
     if (request.method === "OPTIONS") return new Response(null, { headers });
     const url = new URL(request.url);
@@ -122,23 +177,49 @@ export default {
       return new Response(JSON.stringify({ error: "not found" }), { status: 404, headers });
     }
 
-    let question;
+    // Guard: only serve browser calls from known origins. Without this, any site
+    // (or script) could spend the free Workers AI quota. CORS alone does not stop
+    // the request from running server-side, so reject it before doing any work.
+    if (!allowed.has(origin)) {
+      return new Response(JSON.stringify({ error: "forbidden" }), { status: 403, headers });
+    }
+
+    let question, history;
     try {
-      ({ question } = await request.json());
+      ({ question, history } = await request.json());
     } catch { question = null; }
     if (!question || typeof question !== "string" || question.length > 500) {
       return new Response(JSON.stringify({ error: "invalid question" }), { status: 400, headers });
     }
 
+    // Recent turns, defensively validated and bounded.
+    const turns = (Array.isArray(history) ? history : [])
+      .filter((t) => t && typeof t.q === "string" && typeof t.a === "string")
+      .slice(-3)
+      .map((t) => ({ q: t.q.slice(0, 500), a: t.a.slice(0, 1500) }));
+
+    // throttle before spending any AI quota
+    const limited = await checkRateLimit(env, await callerKey(request));
+    if (limited) {
+      return new Response(JSON.stringify({ error: "rate", kind: limited.kind }), {
+        status: 429,
+        headers: { ...headers, "Retry-After": String(limited.retryAfter) },
+      });
+    }
+
     const t0 = Date.now();
+
+    // Short follow-ups ("what about that?") carry no searchable terms on their
+    // own, so retrieve using the recent questions blended with this one.
+    const retrievalQuery = [...turns.slice(-2).map((t) => t.q), question].join(" ");
 
     // 1. embed chunks (cached) + query with the same CF model
     const vecs = await chunkVectors(env);
-    const [qn] = await embed(env, [question]);
+    const [qn] = await embed(env, [retrievalQuery]);
 
     // 2. hybrid score: dense cosine (vectors normalized) + BM25
     const dense = vecs.map((v) => v.reduce((s, x, i) => s + x * qn[i], 0));
-    const lexical = bm25Scores(question);
+    const lexical = bm25Scores(retrievalQuery);
     const dN = minmax(dense), lN = minmax(lexical);
     const combined = dense.map((_, i) => ALPHA * dN[i] + (1 - ALPHA) * lN[i]);
 
@@ -155,6 +236,11 @@ export default {
     const out = await env.AI.run(GEN_MODEL, {
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
+        // prior turns first, so pronouns and follow-ups have an antecedent
+        ...turns.flatMap((t) => [
+          { role: "user", content: t.q },
+          { role: "assistant", content: t.a },
+        ]),
         { role: "user", content: `Today's date: ${today}\n\nProfile context:\n${context}\n\nQuestion: ${question}` },
       ],
       max_tokens: 400,
