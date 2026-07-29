@@ -8,7 +8,8 @@
   <button
     id="pqa-fab"
     aria-label="Ask about Sabil"
-    class="pqa-fab fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-accent px-5 py-3.5 text-accent-fg shadow-xl ring-4 ring-accent/20 transition-transform hover:scale-105"
+    class="pqa-fab fixed right-5 z-50 flex items-center gap-2 rounded-full bg-accent px-5 py-3.5 text-accent-fg shadow-xl ring-4 ring-accent/20 transition-transform hover:scale-105"
+    style="bottom: calc(1.25rem + env(safe-area-inset-bottom))"
   >
     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     <span class="font-display text-sm font-semibold">Ask about me</span>
@@ -18,22 +19,20 @@
     id="pqa-panel"
     role="dialog"
     aria-label="Ask about Sabil"
-    class="fixed bottom-24 right-5 z-50 hidden w-[min(380px,calc(100vw_-_2.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl"
-    style="height:min(460px, 70dvh)"
+    class="fixed right-5 z-50 hidden w-[min(380px,calc(100vw_-_2.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl"
+    style="bottom: calc(6rem + env(safe-area-inset-bottom)); height: min(460px, 70dvh)"
   >
     <div class="flex items-center justify-between bg-accent px-4 py-3 text-accent-fg">
       <span class="font-display font-semibold">Ask about Sabil</span>
-      <div class="flex items-center gap-1">
-        <button
-          id="pqa-min"
-          aria-label="Minimise"
-          aria-expanded="true"
-          class="rounded p-1.5 leading-none opacity-80 transition-opacity hover:opacity-100"
-        >
-          <svg id="pqa-min-icon" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14" /></svg>
-        </button>
-        <button id="pqa-close" aria-label="Close" class="rounded p-1.5 text-xl leading-none opacity-80 transition-opacity hover:opacity-100">×</button>
-      </div>
+      {/* collapses back to the button; the conversation is kept */}
+      <button
+        id="pqa-close"
+        aria-label="Minimise chat"
+        title="Minimise"
+        class="flex h-9 w-9 items-center justify-center rounded opacity-80 transition-opacity hover:opacity-100"
+      >
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+      </button>
     </div>
     <div id="pqa-body" class="flex min-h-0 flex-1 flex-col">
       <div id="pqa-msgs" class="flex-1 space-y-3 overflow-y-auto p-4 text-sm">
@@ -83,23 +82,6 @@
     fab.addEventListener("click", () => toggle(panel.classList.contains("hidden")));
     document.getElementById("pqa-close")!.addEventListener("click", () => toggle(false));
 
-    // Minimise collapses to just the header bar, keeping the conversation.
-    const body = document.getElementById("pqa-body")!;
-    const minBtn = document.getElementById("pqa-min")!;
-    const minIcon = document.getElementById("pqa-min-icon")!;
-    let minimised = false;
-    minBtn.addEventListener("click", () => {
-      minimised = !minimised;
-      body.classList.toggle("hidden", minimised);
-      panel.style.height = minimised ? "auto" : "min(460px, 70dvh)";
-      minBtn.setAttribute("aria-expanded", String(!minimised));
-      minBtn.setAttribute("aria-label", minimised ? "Expand" : "Minimise");
-      // minus when open, plus when collapsed
-      minIcon.innerHTML = minimised
-        ? '<path d="M12 5v14M5 12h14" />'
-        : '<path d="M5 12h14" />';
-      if (!minimised) msgs.scrollTop = msgs.scrollHeight;
-    });
 
     function addMsg(text: string, who: "user" | "bot") {
       const wrap = document.createElement("div");
@@ -108,7 +90,7 @@
       b.className =
         who === "user"
           ? "inline-block rounded-xl bg-accent px-3 py-2 text-accent-fg text-left max-w-[90%]"
-          : "inline-block rounded-xl bg-bg px-3 py-2 text-left max-w-[90%] whitespace-pre-wrap";
+          : "inline-block rounded-xl bg-bg px-3 py-2 text-left max-w-[90%] whitespace-pre-wrap break-words";
       b.textContent = text;
       wrap.appendChild(b);
       msgs.appendChild(wrap);
