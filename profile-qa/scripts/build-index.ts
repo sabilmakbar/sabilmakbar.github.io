@@ -33,6 +33,16 @@ push(
 // --- experience ----------------------------------------------------------
 // Overview chunk carries the career-start date so the model can derive
 // "years of experience" against today's date (the worker injects that).
+// Direct answer to "what does he do?", so generic questions land on the current
+// role rather than on an aspiration chunk.
+const current = experience[0];
+push(
+  "about:current-role",
+  `What Salsabil Maulana Akbar (Sabil) does now, his current job, role, and day-to-day work: ` +
+    `he works as ${current.title} at ${current.org}${(current as any).location ? `, ${(current as any).location}` : ""} ` +
+    `(${current.year}). ${current.points[0]}`,
+);
+
 const first = experience[experience.length - 1];
 const startMatch = first.year.match(/([A-Z][a-z]{2})\s+(\d{4})/);
 const careerStart = startMatch ? `${startMatch[1]} ${startMatch[2]}` : first.year;
