@@ -1,7 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
 import RepoCard from "../components/RepoCard.astro";
-import { repos as fallback } from "../data/repos";
 
 // Two independent groups, resolved at BUILD time:
 //   FEATURED: cross-org research contributions, always shown (hand-picked,
@@ -50,12 +49,15 @@ try {
   own.sort((a: any, b: any) => score(b) - score(a));
   personal = own.slice(0, PERSONAL_LIMIT).map(shape);
 } catch (e) {
-  console.warn("[repositories] GitHub fetch failed, using static fallback:", (e as Error).message);
-  const stat = (repo: string, desc: string) => ({
-    name: repo.split("/")[1], owner: repo.split("/")[0], desc, stars: -1, lang: "", url: `https://github.com/${repo}`,
+  // If the GitHub API is unreachable at build time, degrade to featured
+  // link-cards only (built from the FEATURED list); skip the personal grid
+  // rather than ship a stale hand-maintained list.
+  console.warn("[repositories] GitHub fetch failed, showing featured links only:", (e as Error).message);
+  const stat = (repo: string) => ({
+    name: repo.split("/")[1], owner: repo.split("/")[0], desc: "", stars: -1, lang: "", url: `https://github.com/${repo}`,
   });
-  featured = FEATURED.map((r) => stat(r, ""));
-  personal = fallback.filter((r) => r.repo.startsWith(OWNER + "/")).map((r) => stat(r.repo, r.desc));
+  featured = FEATURED.map(stat);
+  personal = [];
 }
 ---
 
