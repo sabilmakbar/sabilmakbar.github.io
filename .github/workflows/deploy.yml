@@ -7,18 +7,25 @@ on:
   schedule:
     - cron: "0 6 * * 1"      # weekly (Mon 06:00 UTC) — refreshes auto-fetched repo data
 
+# Official GitHub Pages deployment: the built site is uploaded as an artifact and
+# published straight to Pages, so there is no gh-pages branch to write to.
 permissions:
-  contents: write            # to push the built site to gh-pages
+  contents: read
+  pages: write
+  id-token: write
 
+# Never cancel a half-finished deployment; queue instead.
 concurrency:
-  group: deploy-pages
-  cancel-in-progress: true
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  build-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+
+      - uses: actions/configure-pages@v5
 
       - uses: actions/setup-node@v5
         with:
@@ -32,8 +39,16 @@ jobs:
           # used by src/pages/repositories.astro to raise the GitHub API rate limit
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: peaceiris/actions-gh-pages@v4
+      - uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          publish_branch: gh-pages
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
