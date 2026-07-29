@@ -22,7 +22,7 @@ export const profile = {
 };
 
 export const nav = [
-  { label: "About", href: "/" },
+  { label: "About", href: "/about/" },
   { label: "Publications", href: "/publications/" },
   { label: "Repositories", href: "/repositories/" },
   { label: "Resume", href: "/cv/" },

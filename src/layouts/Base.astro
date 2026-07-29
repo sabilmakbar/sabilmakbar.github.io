@@ -1,9 +1,10 @@
 ---
 import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
 import { profile, nav } from "../data/profile";
 import ChatWidget from "../components/ChatWidget.astro";
 
-const { title, description } = Astro.props;
+const { title, description, hideChat = false, hideFooter = false } = Astro.props;
 const pageTitle = title ? `${title} · ${profile.short}` : `${profile.name} · ${profile.tagline}`;
 const desc = description ?? profile.blurb;
 const path = Astro.url.pathname;
@@ -17,6 +18,8 @@ const path = Astro.url.pathname;
     <title>{pageTitle}</title>
     <meta name="description" content={desc} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <ClientRouter />
+
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,12 +28,16 @@ const path = Astro.url.pathname;
       rel="stylesheet"
     />
 
-    <!-- set theme before paint to avoid a flash -->
+    <!-- set theme before paint, and re-apply after each view-transition swap -->
     <script is:inline>
       (function () {
-        const t = localStorage.getItem("theme");
-        const dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-        document.documentElement.classList.toggle("dark", dark);
+        const apply = () => {
+          const t = localStorage.getItem("theme");
+          const dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.classList.toggle("dark", dark);
+        };
+        apply();
+        document.addEventListener("astro:after-swap", apply);
       })();
     </script>
   </head>
@@ -107,34 +114,41 @@ const path = Astro.url.pathname;
       <slot />
     </main>
 
-    <footer class="border-t border-border">
-      <div class="mx-auto flex max-w-4xl flex-col gap-2 px-6 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-        <span>© {new Date().getFullYear()} {profile.name}</span>
-        <div class="flex gap-4">
-          {profile.social.map((s) => (
-            <a href={s.href} class="hover:text-accent transition-colors" rel="me noopener" target="_blank">{s.label}</a>
-          ))}
+    {!hideFooter && (
+      <footer class="border-t border-border">
+        <div class="mx-auto flex max-w-4xl flex-col gap-2 px-6 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
+          <span>© {new Date().getFullYear()} {profile.name}</span>
+          <div class="flex gap-4">
+            {profile.social.map((s) => (
+              <a href={s.href} class="hover:text-accent transition-colors" rel="me noopener" target="_blank">{s.label}</a>
+            ))}
+          </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+    )}
 
-    <ChatWidget />
+    {!hideChat && <ChatWidget />}
 
-    <script is:inline>
-      document.getElementById("theme-toggle")?.addEventListener("click", () => {
-        const dark = document.documentElement.classList.toggle("dark");
-        localStorage.setItem("theme", dark ? "dark" : "light");
-      });
-      const navToggle = document.getElementById("nav-toggle");
-      const mobileMenu = document.getElementById("mobile-menu");
-      navToggle?.addEventListener("click", () => {
-        const open = mobileMenu.classList.toggle("hidden") === false;
-        navToggle.setAttribute("aria-expanded", String(open));
-      });
-      // close the menu after tapping a link
-      mobileMenu?.querySelectorAll("a").forEach((a) =>
-        a.addEventListener("click", () => mobileMenu.classList.add("hidden")),
-      );
+    <script>
+      // Header controls are re-rendered on each view-transition navigation, so
+      // (re)bind them on every astro:page-load rather than once.
+      function setupChrome() {
+        document.getElementById("theme-toggle")?.addEventListener("click", () => {
+          const dark = document.documentElement.classList.toggle("dark");
+          localStorage.setItem("theme", dark ? "dark" : "light");
+        });
+        const navToggle = document.getElementById("nav-toggle");
+        const mobileMenu = document.getElementById("mobile-menu");
+        navToggle?.addEventListener("click", () => {
+          const open = mobileMenu!.classList.toggle("hidden") === false;
+          navToggle.setAttribute("aria-expanded", String(open));
+        });
+        // close the menu after tapping a link
+        mobileMenu?.querySelectorAll("a").forEach((a) =>
+          a.addEventListener("click", () => mobileMenu.classList.add("hidden")),
+        );
+      }
+      document.addEventListener("astro:page-load", setupChrome);
     </script>
   </body>
 </html>
