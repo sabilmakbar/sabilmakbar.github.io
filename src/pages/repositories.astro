@@ -14,8 +14,8 @@ const FEATURED = [
   "indonlp/cendol",
   "SEACrowd/seacrowd-experiments",
 ];
-// GitHub profile-config repo + this site's own repo, not "projects" to feature
-const EXCLUDE_OWN = new Set(["sabilmakbar", "sabilmakbar.github.io"]);
+// profile-config repo, this site's own repo, and the memory template, not "projects" to feature
+const EXCLUDE_OWN = new Set(["sabilmakbar", "sabilmakbar.github.io", "claude-memories-template"]);
 const PERSONAL_LIMIT = 6;
 
 // read at build time (GitHub Actions provides GITHUB_TOKEN in the environment)
