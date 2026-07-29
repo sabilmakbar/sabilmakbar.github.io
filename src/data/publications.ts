@@ -15,16 +15,16 @@ export const publications: Pub[] = [
       "Holy Lovenia, Rahmad Mahendra, Salsabil Maulana Akbar, Samuel Cahyawijaya, Genta Indra Winata, et al.",
     venue: "EMNLP (Main)",
     year: 2024,
-    url: "https://aclanthology.org/2024.emnlp-main.296",
+    url: "https://aclanthology.org/2024.emnlp-main.296/",
     selected: true,
   },
   {
     title: "Cendol: Open Instruction-tuned Generative Large Language Models for Indonesian Languages",
     authors:
       "Samuel Cahyawijaya, Holy Lovenia, Fajri Koto, Rifki Afina Putri, Emmanuel Dave, Jhonson Lee, Nuur Shadieq, Wawan Cenggoro, Salsabil Maulana Akbar, et al.",
-    venue: "arXiv",
+    venue: "ACL (Main)",
     year: 2024,
-    url: "https://api.semanticscholar.org/CorpusID:269009450",
+    url: "https://aclanthology.org/2024.acl-long.796/",
     selected: true,
   },
   {
@@ -33,13 +33,14 @@ export const publications: Pub[] = [
       "Samuel Cahyawijaya, Holy Lovenia, Fajri Koto, Dea Adhista, Emmanuel Dave, Sarah Oktavianti, Salsabil Akbar, et al.",
     venue: "IJCNLP-AACL",
     year: 2023,
-    url: "https://aclanthology.org/2023.ijcnlp-main.60",
+    url: "https://aclanthology.org/2023.ijcnlp-main.60/",
     selected: true,
   },
   {
     title: "Assessment of Fire Stations Distribution Using Geographic Information System, Case Study in Jakarta Pusat",
     authors: "Fathin Nurzaman, Malvin Napitupulu, Salsabil Akbar",
-    venue: "",
+    venue: "Indonesian Geomatics Seminar",
     year: 2022,
+    url: "https://www.researchgate.net/publication/358963034_Assessment_of_Fire_Stations_Distribution_Using_Geographic_Information_System_Case_Study_in_Jakarta_Pusat",
   },
 ];
