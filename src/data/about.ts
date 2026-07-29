@@ -1,5 +1,13 @@
 // About-page bio content. Kept as data so both the page and the QA chatbot
 // index (build-index.ts) draw from the same source.
+// Phrases the hero tagline cycles through. First one is the static fallback.
+export const taglines = [
+  "AI & Machine Learning Engineer",
+  "NLP · Speech · Information Retrieval",
+  "Turning data into production AI systems",
+  "Applied mathematics, in production",
+];
+
 export const about = {
   summary:
     "AI professional with ~5 years of experience in Data Science & Machine Learning, applying a strong mathematics foundation to deliver end-to-end AI solutions across NLP, Speech, Computer Vision, and Tabular domains. Experienced in both startups and multinational corporations.",
@@ -28,15 +36,23 @@ export const about = {
       text: "Actively growing into Explainable AI and Causal Inference, working toward AI that is trustworthy and interpretable.",
     },
   ],
+  // Tech grouped by where it was used, rather than a flat buzzword list.
   keywords: [
-    { group: "Domains", items: "NLP, Speech & Voice AI, Information Retrieval, Computer Vision, Tabular Data" },
     {
-      group: "Methodologies",
-      items: "LLMs & RAG, Applied Mathematics, Deep Learning",
+      group: "Voice AI (current role)",
+      items: "Python, LLMs & RAG, vLLM, Speech & audio models, FastAPI, AWS, Docker, Kubernetes, Airflow, DVC",
     },
     {
-      group: "Infrastructure & Tools",
-      items: "Python, Cloud & MLOps (Docker, Kubernetes, Airflow), Vector Databases, Scalable AI Systems",
+      group: "Search & IR (Tokopedia, TikTok)",
+      items: "Query understanding, retrieval & ranking, Vector Databases, model distillation & quantization, Airflow, GCP",
+    },
+    {
+      group: "Fraud & Risk (fintech startup)",
+      items: "Graph Data Science (Neo4j), anomaly and network analysis, SQL, Airflow",
+    },
+    {
+      group: "Proptech (Pashouses)",
+      items: "Multimodal modeling (tabular, text, image), ETL pipelines, GCP",
     },
   ],
 };
