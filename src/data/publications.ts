@@ -10,6 +10,15 @@ export interface Pub {
 // "Salsabil" / "Akbar" is highlighted in the UI where it appears in `authors`.
 export const publications: Pub[] = [
   {
+    title: "SEACrowd: A Multilingual Multimodal Data Hub and Benchmark Suite for Southeast Asian Languages",
+    authors:
+      "Holy Lovenia, Rahmad Mahendra, Salsabil Maulana Akbar, Samuel Cahyawijaya, Genta Indra Winata, et al.",
+    venue: "EMNLP (Main)",
+    year: 2024,
+    url: "https://aclanthology.org/2024.emnlp-main.296",
+    selected: true,
+  },
+  {
     title: "Cendol: Open Instruction-tuned Generative Large Language Models for Indonesian Languages",
     authors:
       "Samuel Cahyawijaya, Holy Lovenia, Fajri Koto, Rifki Afina Putri, Emmanuel Dave, Jhonson Lee, Nuur Shadieq, Wawan Cenggoro, Salsabil Maulana Akbar, et al.",

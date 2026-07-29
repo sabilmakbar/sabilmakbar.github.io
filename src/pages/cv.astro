@@ -31,7 +31,12 @@ const timeline = [
               </h3>
               <span class="font-mono text-xs text-muted">{it.year}</span>
             </div>
-            {it.org && <p class="text-sm text-accent">{it.org}</p>}
+            {it.org && (
+              <p class="text-sm text-accent">
+                {it.org}
+                {it.location && <span class="text-muted"> · {it.location}</span>}
+              </p>
+            )}
             {it.points && (
               <ul class="mt-2 space-y-1 text-sm text-fg/90">
                 {it.points.map((p: string) => (
