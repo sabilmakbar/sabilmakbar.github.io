@@ -95,8 +95,15 @@ index if you touched CV, profile, or publications.
 | --- | --- | --- |
 | Job / experience / education | `src/data/cv.ts` (and `profile.ts` if the current role changed) | `npm run build:index` |
 | Publications | `src/data/publications.ts` | `npm run build:index` |
-| Profile bio / links / tagline | `src/data/profile.ts` | `npm run build:index` |
+| Profile links / tagline / nav | `src/data/profile.ts` | `npm run build:index` |
+| About bio, tech stack, interests | `src/data/about.ts` | `npm run build:index` |
+| Teaching, talks, activities | `src/pages/activities.astro` | nothing |
+| Blog post | add/edit Markdown in `src/content/blog/` | nothing |
 | Featured repos | `FEATURED` in `src/pages/repositories.astro` | nothing |
+
+Blog posts are Markdown with frontmatter (`title`, `date`, `summary`, `tags`,
+optional `repo`, `draft`). Set `draft: true` to keep one unpublished; when no
+posts are published, `/blog` shows a "coming soon" page automatically.
 
 ```bash
 npm run build:index    # regenerates profile-qa/worker/src/index.json from src/data
@@ -171,6 +178,21 @@ npx wrangler d1 execute profile-qa-logs --remote \
   --command "SELECT ts, question, latency_ms FROM qa_log ORDER BY id DESC LIMIT 20;"
 ```
 
+## 6c. Forking this site
+
+The QA worker only answers calls from origins it recognises, and the site points
+at one specific deployed worker. Two things to change when replicating:
+
+1. **`profile-qa/worker/wrangler.toml`** — set `ALLOWED_ORIGINS` to your own site
+   (comma-separated). The `http://localhost:4321` entries are relative to
+   whoever runs the dev server, so they already work for anyone; only the
+   production domain needs swapping.
+2. **`src/lib/qa.ts`** — set `ENDPOINT` to your own worker URL, printed by
+   `wrangler deploy`.
+
+Also change `name` in `wrangler.toml` (worker name) and, if you use the QA log,
+create your own D1 database and update `database_id`.
+
 ## 7. Secrets and configuration
 
 - **GitHub Actions:** `GITHUB_TOKEN` is provided automatically by Actions; no
@@ -191,4 +213,5 @@ npx wrangler d1 execute profile-qa-logs --remote \
 | `Tsconfig not found` on `npx astro build` | You ran a stray global Astro. Use `npm run build` so the project's local Astro is used. |
 | Empty personal-projects grid locally | GitHub API rate limit. Set `GITHUB_TOKEN` before `npm run dev`. |
 | Chatbot answers with stale info | You edited `src/data` but did not re-index or redeploy. Run `npm run build:index`, then `npx wrangler deploy` in `profile-qa/worker`. |
+| Chat widget fails locally ("couldn't reach the assistant") | Your dev origin is not in `ALLOWED_ORIGINS`. The worker allows `http://localhost:4321` (Astro's default port); if you run the dev server on another port, add that origin in `profile-qa/worker/wrangler.toml` and redeploy. |
 | `build:index` fails on a TypeScript error | Ensure Node is 22.12+; older Node lacks `--experimental-strip-types`. |

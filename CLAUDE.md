@@ -10,13 +10,21 @@ runs on free, open-source infrastructure.
 
 - `src/` — the Astro site (pages, layouts, components, styles).
 - `src/data/*.ts` — **the single source of truth for all content** (see below).
+- `src/content/blog/` — blog posts as Markdown (schema in `src/content.config.ts`).
 - `src/lib/qa.ts` — shared QA client (endpoint, transcript store, fetch, varied
   error messages) used by both the floating `ChatWidget` and the landing page.
-- Routing: `/` is a Google-style landing (ask box, inline answers); the profile
-  lives at `/about`. The site uses Astro view transitions (`<ClientRouter />`),
-  and the chat widget is marked `transition:persist` so an open chat and its
-  history survive navigation. The transcript is also mirrored to `sessionStorage`,
-  shared between the landing and the widget.
+
+## Routing
+
+- `/` — landing page with an ask box that answers inline.
+- `/about` — the profile (bio, core experience, tech stack, selected publications).
+- `/blog` — posts; shows a "coming soon" state when nothing is published.
+- `/publications`, `/repositories`, `/cv`, `/activities`.
+
+The site uses Astro view transitions (`<ClientRouter />`), and the chat widget is
+marked `transition:persist` so an open chat and its history survive navigation.
+The transcript is mirrored to `sessionStorage` and shared between the landing
+page and the widget.
 - `profile-qa/worker/` — the QA chatbot, a Cloudflare Worker (Workers AI).
 - `profile-qa/worker/src/index.json` — the chatbot's search index. **Generated, do not edit by hand.**
 - `profile-qa/scripts/build-index.ts` — generates that index from `src/data`.
@@ -33,9 +41,11 @@ runs on free, open-source infrastructure.
 
 All content lives in `src/data/`:
 
-- `profile.ts` — name, tagline, location, blurb, social links, nav.
+- `profile.ts` — name, tagline, location, blurb, social/scholar links, nav.
+- `about.ts` — About-page bio: summary, core experience, tech stack grouped by
+  where it was used, "currently exploring" interests, and rotating taglines.
 - `cv.ts` — education, experience, projects, interests.
-- `publications.ts` — papers.
+- `publications.ts` — papers (link to the published venue, e.g. ACL Anthology).
 
 The Repositories page fetches the repo list live from GitHub at build time; there
 is no committed repo data. Featured cross-org repos are hand-picked in the
@@ -72,6 +82,13 @@ stays in sync with the site.
   from the structured data and nothing else.
 - The worker's CORS is locked to the site origin plus localhost.
 
+## Typography
+
+Site chrome is sans (Inter, with Inter Tight for headings); long-form article
+prose is set in a serif (Source Serif 4) for reading comfort, with JetBrains Mono
+for code. Fonts are defined once as tokens in `src/styles/global.css` and loaded
+in `src/layouts/Base.astro`.
+
 ## QA engine notes
 
 - Cloudflare Workers AI, free tier. No paid APIs.
@@ -79,6 +96,13 @@ stays in sync with the site.
   - Generation: `@cf/meta/llama-3.1-8b-instruct-fp8`.
 - Hybrid retrieval: dense cosine similarity plus BM25. Chunk vectors are embedded
   once per isolate and cached.
+- The widget sends the last few turns as `history`. They are replayed as chat
+  messages so follow-up questions resolve, and blended into the retrieval query
+  so short follow-ups still match the right chunks.
+- `/chat` rejects any request whose `Origin` is not allowed, before doing any AI
+  work, so other sites and scripts cannot spend the free quota. The list comes
+  from `ALLOWED_ORIGINS` in `wrangler.toml` (comma-separated), falling back to
+  defaults in the code. Note this stops casual abuse, not a forged-header client.
 - The worker injects today's date into the prompt so time-relative answers (such
   as years of experience) stay correct without editing data. The
   `cv:experience:overview` chunk carries the career start date for that math.
