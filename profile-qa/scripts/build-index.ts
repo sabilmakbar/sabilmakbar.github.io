@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 import { profile } from "../../src/data/profile.ts";
+import { about } from "../../src/data/about.ts";
 import { education, experience, projects, academicInterests, otherInterests } from "../../src/data/cv.ts";
 import { publications } from "../../src/data/publications.ts";
 
@@ -20,7 +21,14 @@ const push = (source: string, text: string) => chunks.push({ source, text: strip
 
 // --- identity / bio ------------------------------------------------------
 push("about:headline", `Current focus of Salsabil Maulana Akbar (Sabil): ${profile.tagline}. Based in ${profile.location}.`);
-push("about:bio", profile.blurb);
+push("about:bio", about.summary);
+for (const c of about.coreExperience) push(`about:core:${c.label}`, `${c.label}: ${c.text}`);
+for (const c of about.exploring)
+  push(`about:interest:${c.label}`, `Interest and future direction (not past industry work) — ${c.label}: ${c.text}`);
+push(
+  "about:keywords",
+  "Keywords, domains, and tech stack for Sabil: " + about.keywords.map((k) => `${k.group}: ${k.items}`).join("; ") + ".",
+);
 
 // --- experience ----------------------------------------------------------
 // Overview chunk carries the career-start date so the model can derive
