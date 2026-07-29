@@ -1,0 +1,12 @@
+# python
+**/.venv/
+**/__pycache__/
+**/*.pyc
+**/*.egg-info/
+
+# node
+**/node_modules/
+
+# misc
+**/*.log
+.DS_Store

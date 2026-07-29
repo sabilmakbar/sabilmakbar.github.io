@@ -1,0 +1,7 @@
+name = "profile-qa-cf"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# Workers AI binding — gives the Worker env.AI.run(model, input)
+[ai]
+binding = "AI"

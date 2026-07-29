@@ -22,3 +22,10 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# profile-qa backend (Python) + worker
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+*.log
