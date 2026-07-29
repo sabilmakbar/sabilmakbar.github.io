@@ -82,3 +82,8 @@ stays in sync with the site.
 - The worker injects today's date into the prompt so time-relative answers (such
   as years of experience) stay correct without editing data. The
   `cv:experience:overview` chunk carries the career start date for that math.
+- Each question and answer is logged to a Cloudflare D1 database
+  (`profile-qa-logs`, binding `DB`) for review, with no IPs or visitor
+  identifiers. Logging is best-effort via `ctx.waitUntil`, so it never delays or
+  breaks an answer. Schema is in `profile-qa/worker/schema.sql`; see
+  DEPLOYMENT_GUIDE.md for how to query it.

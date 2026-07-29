@@ -5,3 +5,9 @@ compatibility_date = "2024-11-01"
 # Workers AI binding — gives the Worker env.AI.run(model, input)
 [ai]
 binding = "AI"
+
+# D1 (SQLite) binding — env.DB, used to log questions/answers for review.
+[[d1_databases]]
+binding = "DB"
+database_name = "profile-qa-logs"
+database_id = "861b964d-9b91-45b4-8c12-89152a5f0dc4"

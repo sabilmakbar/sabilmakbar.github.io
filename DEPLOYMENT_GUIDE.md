@@ -149,6 +149,28 @@ curl -s -X POST https://profile-qa-cf.maulana-1998.workers.dev/chat \
 
 ---
 
+## 6b. QA logs (Cloudflare D1)
+
+The worker logs each question and answer to a D1 database (`profile-qa-logs`,
+binding `DB`), with no IPs or visitor identifiers. This is best-effort and never
+blocks a reply.
+
+One-time setup (already done for this repo, listed for reproducibility):
+
+```bash
+cd profile-qa/worker
+npx wrangler d1 create profile-qa-logs          # prints the database_id for wrangler.toml
+npx wrangler d1 execute profile-qa-logs --remote --file=schema.sql
+```
+
+Query the log:
+
+```bash
+cd profile-qa/worker
+npx wrangler d1 execute profile-qa-logs --remote \
+  --command "SELECT ts, question, latency_ms FROM qa_log ORDER BY id DESC LIMIT 20;"
+```
+
 ## 7. Secrets and configuration
 
 - **GitHub Actions:** `GITHUB_TOKEN` is provided automatically by Actions; no

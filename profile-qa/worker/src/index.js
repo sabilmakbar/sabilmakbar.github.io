@@ -95,8 +95,21 @@ function corsHeaders(origin) {
   return h;
 }
 
+// Log one Q&A to D1. Best-effort: never throws into the request path.
+async function logQA(env, row) {
+  if (!env.DB) return;
+  try {
+    await env.DB
+      .prepare("INSERT INTO qa_log (ts, question, answer, sources, latency_ms) VALUES (?, ?, ?, ?, ?)")
+      .bind(row.ts, row.question, row.answer, row.sources, row.latency_ms)
+      .run();
+  } catch (e) {
+    console.error("qa_log insert failed:", e);
+  }
+}
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const origin = request.headers.get("Origin") || "";
     const headers = corsHeaders(origin);
 
@@ -116,6 +129,8 @@ export default {
     if (!question || typeof question !== "string" || question.length > 500) {
       return new Response(JSON.stringify({ error: "invalid question" }), { status: 400, headers });
     }
+
+    const t0 = Date.now();
 
     // 1. embed chunks (cached) + query with the same CF model
     const vecs = await chunkVectors(env);
@@ -146,9 +161,20 @@ export default {
       temperature: 0.2,
     });
 
-    return new Response(
-      JSON.stringify({ answer: (out.response || "").trim(), sources: top.map((i) => CHUNKS[i].source) }),
-      { headers },
+    const answer = (out.response || "").trim();
+    const sources = top.map((i) => CHUNKS[i].source);
+
+    // best-effort logging, off the response path
+    ctx.waitUntil(
+      logQA(env, {
+        ts: new Date().toISOString(),
+        question,
+        answer,
+        sources: JSON.stringify(sources),
+        latency_ms: Date.now() - t0,
+      }),
     );
+
+    return new Response(JSON.stringify({ answer, sources }), { headers });
   },
 };
