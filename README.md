@@ -1,25 +1,25 @@
 # sabilmakbar.github.io
 
-Personal site of Salsabil Maulana Akbar, built with [Astro](https://astro.build)
-+ Tailwind CSS. Deployed to GitHub Pages via GitHub Actions (`.github/workflows/deploy.yml`).
+Personal website of Salsabil (Sabil) Maulana Akbar, a Data Scientist working on
+Search, NLP, and information retrieval. Live at
+[sabilmakbar.github.io](https://sabilmakbar.github.io).
 
-## Develop
+It covers his background, publications, open-source work, resume, and teaching.
 
-```bash
-npm install
-npm run dev        # local dev server
-npm run build      # production build → dist/
-```
+## Notable bits (feel free to take inspiration)
 
-## Structure
+A couple of pieces here might be useful if you're building your own site:
 
-- `src/pages/` — routes (about, publications, repositories, cv, teaching)
-- `src/data/` — content as data (profile, cv, publications, repos)
-- `src/components/` — layout, cards, chat widget
-- `public/` — static assets
+- **Auto-updating repositories page.** It fetches GitHub data at build time, and a
+  weekly scheduled workflow keeps it fresh, so featured repos and stars stay current
+  with no manual edits. See `src/pages/repositories.astro` and `.github/workflows/`.
+- **Profile chat assistant.** The floating widget answers questions about the profile
+  using a small, fully open-source RAG engine (hybrid retrieval plus an open LLM)
+  that runs free on Cloudflare Workers AI. The engine lives in `profile-qa/`.
 
-The **Repositories** page auto-fetches GitHub data at build time (the weekly
-scheduled workflow keeps it fresh). The floating chat widget is powered by a
-separate open-source RAG engine on Cloudflare Workers AI.
+## Stack
 
-> The previous al-folio (Jekyll) version is preserved on the `al-folio-backup` branch.
+Astro + Tailwind CSS, deployed to GitHub Pages via GitHub Actions. Content lives as
+data in `src/data/`, so updating the site is mostly editing data rather than markup.
+
+Fork and adapt it for your own site.
