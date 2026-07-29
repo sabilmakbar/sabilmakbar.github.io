@@ -32,7 +32,7 @@ import { profile } from "../data/profile";
     <form id="ask-form" autocomplete="off" class="mt-8 w-full">
       <div class="flex items-center gap-2 rounded-full border border-border bg-surface px-5 py-3 shadow-lg transition-colors focus-within:border-accent">
         <svg class="h-5 w-5 shrink-0 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
-        <div class="relative flex-1">
+        <div class="relative min-w-0 flex-1">
           <input
             id="ask-input"
             type="text"
@@ -105,7 +105,7 @@ import { profile } from "../data/profile";
       qEl.className = "font-display font-semibold text-fg";
       qEl.textContent = q;
       const aEl = document.createElement("p");
-      aEl.className = "mt-2 whitespace-pre-wrap leading-relaxed text-fg/90";
+      aEl.className = "mt-2 whitespace-pre-wrap break-words leading-relaxed text-fg/90";
       aEl.textContent = a;
       wrap.append(qEl, aEl);
       results.append(wrap);

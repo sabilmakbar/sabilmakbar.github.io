@@ -104,7 +104,33 @@
   font-family: var(--font-serif);
   font-size: 1.15rem;
   line-height: 1.8;
+  /* a bare URL in a post must not push the page sideways */
+  overflow-wrap: break-word;
 }
+
+/* narrower measure needs a slightly smaller size to keep line length sane */
+@media (max-width: 640px) {
+  .prose {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+}
+
+/* tables scroll inside the article rather than widening the page */
+.prose table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+.prose th,
+.prose td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+.prose th { font-weight: 600; background: var(--surface); }
 .prose > * + * { margin-top: 1.25em; }
 .prose h2 {
   font-family: var(--font-display);

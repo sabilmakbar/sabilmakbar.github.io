@@ -36,9 +36,9 @@ const fmt = (d: Date) => d.toLocaleDateString("en-US", { year: "numeric", month:
 
       {allTags.length > 0 && (
         <div id="tag-bar" class="mb-8 flex flex-wrap gap-2">
-          <button data-tag="" class="tag-btn rounded-full border border-accent bg-accent px-3 py-1 text-xs font-medium text-accent-fg">All</button>
+          <button data-tag="" class="tag-btn flex min-h-9 items-center rounded-full border border-accent bg-accent px-3.5 text-xs font-medium text-accent-fg">All</button>
           {allTags.map((t) => (
-            <button data-tag={t} class="tag-btn rounded-full border border-border px-3 py-1 text-xs text-muted transition-colors hover:border-accent hover:text-accent">
+            <button data-tag={t} class="tag-btn flex min-h-9 items-center rounded-full border border-border px-3.5 text-xs text-muted transition-colors hover:border-accent hover:text-accent">
               {t}
             </button>
           ))}
@@ -49,7 +49,7 @@ const fmt = (d: Date) => d.toLocaleDateString("en-US", { year: "numeric", month:
         {posts.map((p) => (
           <li class="post-item py-6" data-tags={p.data.tags.join(",")}>
             <a href={`/blog/${p.id}/`} class="group block">
-              <div class="flex items-baseline justify-between gap-3">
+              <div class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
                 <h2 class="font-display text-lg font-semibold text-fg transition-colors group-hover:text-accent">{p.data.title}</h2>
                 <span class="shrink-0 font-mono text-xs text-muted">{fmt(p.data.date)}</span>
               </div>
@@ -88,7 +88,7 @@ const fmt = (d: Date) => d.toLocaleDateString("en-US", { year: "numeric", month:
       buttons.forEach((b) => {
         const on = b.dataset.tag === tag;
         b.className =
-          "tag-btn rounded-full border px-3 py-1 text-xs transition-colors " +
+          "tag-btn flex min-h-9 items-center rounded-full border px-3.5 text-xs transition-colors " +
           (on ? active : idle + " hover:border-accent hover:text-accent");
       });
       let shown = 0;

@@ -21,7 +21,7 @@ const timeline = [
       <div class="space-y-6">
         {section.items.map((it: any) => (
           <div class="border-l border-border pl-5">
-            <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
               <h3 class="font-display font-semibold">
                 {it.href ? (
                   <a href={it.href} target="_blank" rel="noopener" class="hover:text-accent transition-colors">{it.title}</a>
@@ -29,7 +29,7 @@ const timeline = [
                   it.title
                 )}
               </h3>
-              <span class="font-mono text-xs text-muted">{it.year}</span>
+              <span class="whitespace-nowrap font-mono text-xs text-muted">{it.year}</span>
             </div>
             {it.org && (
               <p class="text-sm text-accent">
