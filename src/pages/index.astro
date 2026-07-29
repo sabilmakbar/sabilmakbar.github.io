@@ -124,28 +124,37 @@ import { profile } from "../data/profile";
     if (hint && suggestions.length > 1 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       const FADE = 700; // must match the span's duration-700
 
-      input.placeholder = ""; // hand off to the animated overlay
+      // Hand off to the overlay for good. The native placeholder is never
+      // restored, otherwise both would render at once.
+      input.placeholder = "";
       hint.textContent = suggestions[0];
       hint.classList.replace("hidden", "flex");
       requestAnimationFrame(() => (hint.style.opacity = "1"));
 
+      const idle = () => document.activeElement !== input && !input.value;
+
       let i = 0;
-      const timer = setInterval(() => {
-        if (document.activeElement === input || input.value) return;
+      setInterval(() => {
+        if (!idle()) return;
         hint.style.opacity = "0";
         setTimeout(() => {
+          if (!idle()) return;
           i = (i + 1) % suggestions.length;
           hint.textContent = suggestions[i];
           hint.style.opacity = "1";
         }, FADE);
       }, 4200); // fade out + hold + fade in
 
-      const stop = () => {
-        clearInterval(timer);
-        hint.style.opacity = "0";
-        input.placeholder = suggestions[0]; // restore a steady placeholder
-      };
-      input.addEventListener("focus", stop, { once: true });
+      // hide while typing or focused, bring back the opening line when idle
+      input.addEventListener("focus", () => (hint.style.opacity = "0"));
+      input.addEventListener("input", () => (hint.style.opacity = "0"));
+      input.addEventListener("blur", () => {
+        if (!input.value) {
+          i = 0;
+          hint.textContent = suggestions[0];
+          hint.style.opacity = "1";
+        }
+      });
     }
 
     form.addEventListener("submit", async (e) => {
