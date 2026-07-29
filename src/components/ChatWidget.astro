@@ -18,8 +18,8 @@
     id="pqa-panel"
     role="dialog"
     aria-label="Ask about Sabil"
-    class="fixed bottom-24 right-5 z-50 hidden w-[min(380px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl"
-    style="height:min(520px,calc(100vh-9rem))"
+    class="fixed bottom-24 right-5 z-50 hidden w-[min(380px,calc(100vw_-_2.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl"
+    style="height:min(260px, calc(100vh - 9rem))"
   >
     <div class="flex items-center justify-between bg-accent px-4 py-3 text-accent-fg">
       <span class="font-display font-semibold">Ask about Sabil</span>
@@ -99,13 +99,17 @@
       addMsg(q, "user");
       input.value = "";
       send.disabled = true;
-      const thinking = addMsg("…", "bot");
-      const wake = setTimeout(() => { thinking.textContent = "Thinking…"; }, 3000);
+      const thinking = addMsg("", "bot");
+      thinking.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+      // the free tier can cold-start, so reassure rather than look stuck
+      const wake = setTimeout(() => {
+        thinking.innerHTML = '<span class="typing"><i></i><i></i><i></i></span> <span class="text-muted">still working…</span>';
+      }, 8000);
 
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 60000);
+      const timeout = setTimeout(() => controller.abort(), 45000);
       try {
-        const answer = await askProfileQA(q, controller.signal);
+        const answer = await askProfileQA(q, controller.signal, turns);
         thinking.textContent = answer;
         turns.push({ q, a: answer });
         saveTranscript(turns);
