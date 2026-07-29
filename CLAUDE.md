@@ -10,6 +10,13 @@ runs on free, open-source infrastructure.
 
 - `src/` — the Astro site (pages, layouts, components, styles).
 - `src/data/*.ts` — **the single source of truth for all content** (see below).
+- `src/lib/qa.ts` — shared QA client (endpoint, transcript store, fetch, varied
+  error messages) used by both the floating `ChatWidget` and the landing page.
+- Routing: `/` is a Google-style landing (ask box, inline answers); the profile
+  lives at `/about`. The site uses Astro view transitions (`<ClientRouter />`),
+  and the chat widget is marked `transition:persist` so an open chat and its
+  history survive navigation. The transcript is also mirrored to `sessionStorage`,
+  shared between the landing and the widget.
 - `profile-qa/worker/` — the QA chatbot, a Cloudflare Worker (Workers AI).
 - `profile-qa/worker/src/index.json` — the chatbot's search index. **Generated, do not edit by hand.**
 - `profile-qa/scripts/build-index.ts` — generates that index from `src/data`.
