@@ -71,7 +71,9 @@ import { profile } from "../data/profile";
           Take me to the site →
         </a>
       </div>
-      <p class="mt-3 text-xs text-muted">Answers are generated from this site's profile content.</p>
+      <p class="mt-3 text-xs text-muted">
+        One question at a time here. For a back and forth, continue in the chat.
+      </p>
     </form>
 
     <div id="ask-results" class="mt-10 w-full space-y-5 text-left"></div>
@@ -93,7 +95,10 @@ import { profile } from "../data/profile";
 
     const turns: Turn[] = loadTranscript();
 
+    // The landing answers one question at a time; a conversation belongs in the
+    // chat widget, so each ask replaces the previous answer rather than stacking.
     function card(q: string, a: string) {
+      results.replaceChildren();
       const wrap = document.createElement("div");
       wrap.className = "rounded-2xl border border-border bg-surface p-5";
       const qEl = document.createElement("p");
@@ -103,12 +108,21 @@ import { profile } from "../data/profile";
       aEl.className = "mt-2 whitespace-pre-wrap leading-relaxed text-fg/90";
       aEl.textContent = a;
       wrap.append(qEl, aEl);
-      results.prepend(wrap);
+      results.append(wrap);
       return aEl;
     }
 
-    // rehydrate prior questions (e.g. returning to the landing)
-    for (const t of turns) card(t.q, t.a);
+    // once answered, offer to carry the thread into the chat widget
+    function offerChat() {
+      if (document.getElementById("ask-continue")) return;
+      const a = document.createElement("a");
+      a.id = "ask-continue";
+      a.href = "/about/?chat=1";
+      a.className =
+        "mt-4 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-muted transition-colors hover:border-accent hover:text-accent";
+      a.textContent = "Continue in chat →";
+      results.append(a);
+    }
 
     // Cycle example questions so visitors see what they can ask. The native
     // placeholder cannot be animated, so an overlay span is faded instead; the
@@ -161,8 +175,9 @@ import { profile } from "../data/profile";
       e.preventDefault();
       const q = input.value.trim();
       if (!q) return;
-      input.value = "";
+      // the question stays in the box so it can be tweaked and asked again
       send.disabled = true;
+      hint.style.opacity = "0";
       const aEl = card(q, "");
       aEl.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
       const wake = setTimeout(() => {
@@ -172,10 +187,13 @@ import { profile } from "../data/profile";
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 45000);
       try {
-        const answer = await askProfileQA(q, controller.signal, turns);
+        // no history sent: the landing is one-off. The turn is still stored so
+        // the chat widget can pick the thread up if the visitor continues there.
+        const answer = await askProfileQA(q, controller.signal, []);
         aEl.textContent = answer;
         turns.push({ q, a: answer });
         saveTranscript(turns);
+        offerChat();
       } catch (err) {
         aEl.textContent = errorMessage(err);
       } finally {

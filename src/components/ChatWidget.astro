@@ -92,6 +92,9 @@
       addMsg(t.a, "bot");
     }
 
+    // arriving from the landing page's "Continue in chat" opens the panel
+    if (new URLSearchParams(location.search).get("chat") === "1") toggle(true);
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const q = input.value.trim();
