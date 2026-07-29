@@ -7,6 +7,7 @@ export const profile = {
   location: "Kuala Lumpur, Malaysia",
   email: "maulana.1998@yahoo.co.id",
   avatar: "/img/profile.png",
+  avatarAlt: "/img/profile-alt.jpg",
   blurb:
     "AI professional with ~5 years of experience in Data Science & Machine Learning, applying a strong " +
     "mathematics foundation to deliver end-to-end AI solutions across NLP, Speech, Computer Vision, and " +
