@@ -5,7 +5,7 @@ import { profile } from "../data/profile";
 
 <Base hideChat hideFooter>
   <section class="mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center text-center">
-    <div id="hero-avatar" class="avatar-float relative mb-6 h-20 w-20">
+    <div id="hero-avatar" class="relative mb-6 h-20 w-20">
       <img
         src={profile.avatar}
         alt={profile.name}
@@ -207,13 +207,3 @@ import { profile } from "../data/profile";
   document.addEventListener("astro:page-load", init);
   document.addEventListener("astro:page-load", initAvatar);
 </script>
-
-<style>
-  /* same gentle drift as the about-page avatar */
-  @keyframes avatar-float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-  .avatar-float { animation: avatar-float 6s ease-in-out infinite; }
-  @media (prefers-reduced-motion: reduce) { .avatar-float { animation: none; } }
-</style>
