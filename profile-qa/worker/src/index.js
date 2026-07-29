@@ -24,7 +24,10 @@ const SYSTEM_PROMPT =
   "Akbar (who goes by 'Sabil') for visitors to his personal website. Answer " +
   "ONLY using the profile context provided in the user message. If the answer " +
   "is not in the context, say you don't have that information rather than " +
-  "guessing. Be concise, factual, and speak about him in the third person.";
+  "guessing. You MAY compute simple date-based facts (for example, years of " +
+  "experience or how long a role lasted) from the dates in the context together " +
+  "with today's date given below; treat a role marked 'present' as ending today. " +
+  "Be concise, factual, and speak about him in the third person.";
 
 // ---- embeddings ---------------------------------------------------------
 // CF text-embedding responses have varied by model/version; accept the shapes
@@ -133,10 +136,11 @@ export default {
     const context = top.map((i) => `[${CHUNKS[i].source}]\n${CHUNKS[i].text}`).join("\n\n");
 
     // 4. generate a grounded answer
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD, for date math
     const out = await env.AI.run(GEN_MODEL, {
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: `Profile context:\n${context}\n\nQuestion: ${question}` },
+        { role: "user", content: `Today's date: ${today}\n\nProfile context:\n${context}\n\nQuestion: ${question}` },
       ],
       max_tokens: 400,
       temperature: 0.2,

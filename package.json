@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:index": "node --experimental-strip-types profile-qa/scripts/build-index.ts",
     "preview": "astro preview",
     "astro": "astro"
   },
