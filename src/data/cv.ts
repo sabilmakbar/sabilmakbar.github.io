@@ -15,7 +15,7 @@ export const education = [
 export const experience = [
   {
     title: "AI Engineer (Research)",
-    org: "Revolab",
+    org: "Stealth AI Startup",
     location: "Kuala Lumpur, Malaysia",
     year: "Jan 2025 - present",
     points: [

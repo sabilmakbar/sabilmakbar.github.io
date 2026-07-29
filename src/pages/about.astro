@@ -1,13 +1,13 @@
 ---
 import Base from "../layouts/Base.astro";
-import { profile } from "../data/profile";
+import Icon from "../components/Icon.astro";
+import { profile, scholar } from "../data/profile";
+import { about } from "../data/about";
 import { publications } from "../data/publications";
 
-const focus = [
-  "Search relevance, ranking & retrieval",
-  "NLP for product discovery & query understanding",
-  "Indonesian & low-resource-language NLP",
-];
+// GitHub, LinkedIn, Hugging Face, then the two Scholars, with Email last.
+const email = profile.social.find((s) => s.label === "Email")!;
+const links = [...profile.social.filter((s) => s.label !== "Email"), ...scholar, email];
 const selected = publications.filter((p) => p.selected);
 ---
 
@@ -18,15 +18,16 @@ const selected = publications.filter((p) => p.selected);
       <p class="eyebrow mb-3">{profile.location}</p>
       <h1 class="text-4xl font-bold leading-tight sm:text-5xl">{profile.name}</h1>
       <p class="mt-3 text-lg text-muted">{profile.tagline}</p>
-      <p class="mt-5 leading-relaxed text-fg/90">{profile.blurb}</p>
+      <p class="mt-5 leading-relaxed text-fg/90">{about.summary}</p>
       <div class="mt-6 flex flex-wrap gap-2">
-        {profile.social.map((s) => (
+        {links.map((s) => (
           <a
             href={s.href}
-            target="_blank"
+            target={s.href.startsWith("mailto") ? undefined : "_blank"}
             rel="me noopener"
-            class="rounded-full border border-border px-3.5 py-1.5 text-sm text-muted transition-colors hover:border-accent hover:text-accent"
+            class="flex items-center gap-2 rounded-full border border-border px-3.5 py-1.5 text-sm text-muted transition-colors hover:border-accent hover:text-accent"
           >
+            <Icon name={s.icon} />
             {s.label}
           </a>
         ))}
@@ -41,30 +42,56 @@ const selected = publications.filter((p) => p.selected);
     />
   </section>
 
-  {/* focus */}
+  {/* core experience */}
   <section class="mt-16">
-    <h2 class="eyebrow mb-4">Currently focused on</h2>
-    <ul class="space-y-2">
-      {focus.map((f) => (
-        <li class="flex gap-3 text-fg/90">
-          <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>
-          {f}
-        </li>
+    <h2 class="mb-6 font-display text-xl font-semibold">🚀 Core Experience</h2>
+    <div class="space-y-5">
+      {about.coreExperience.map((c) => (
+        <div>
+          <h3 class="font-display font-semibold text-accent">{c.label}</h3>
+          <p class="mt-1 leading-relaxed text-fg/90">{c.text}</p>
+        </div>
       ))}
-    </ul>
+    </div>
+  </section>
+
+  {/* keywords & tech stack */}
+  <section class="mt-16">
+    <h2 class="mb-6 font-display text-xl font-semibold">🛠️ Keywords & Tech Stack</h2>
+    <dl class="space-y-4">
+      {about.keywords.map((k) => (
+        <div class="sm:flex sm:gap-4">
+          <dt class="font-display font-semibold text-fg sm:w-52 sm:shrink-0">{k.group}</dt>
+          <dd class="mt-1 text-fg/90 sm:mt-0">{k.items}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  {/* currently exploring */}
+  <section class="mt-16">
+    <h2 class="mb-6 font-display text-xl font-semibold">🔭 Currently Exploring</h2>
+    <div class="space-y-5">
+      {about.exploring.map((c) => (
+        <div>
+          <h3 class="font-display font-semibold text-accent">{c.label}</h3>
+          <p class="mt-1 leading-relaxed text-fg/90">{c.text}</p>
+        </div>
+      ))}
+    </div>
   </section>
 
   {/* selected publications */}
   <section class="mt-16">
     <div class="mb-4 flex items-baseline justify-between">
-      <h2 class="eyebrow">Selected publications</h2>
-      <a href="/publications/" class="text-sm text-muted hover:text-accent transition-colors">All publications →</a>
+      <h2 class="font-display text-xl font-semibold">📄 Selected Publications</h2>
+      <a href="/publications/" class="text-sm text-muted transition-colors hover:text-accent">All publications →</a>
     </div>
     <ul class="divide-y divide-border">
       {selected.map((p) => (
         <li class="py-4">
           <a href={p.url} target="_blank" rel="noopener" class="group block">
-            <h3 class="font-display font-semibold leading-snug text-fg group-hover:text-accent transition-colors">{p.title}</h3>
+            <h3 class="font-display font-semibold leading-snug text-fg transition-colors group-hover:text-accent">{p.title}</h3>
             <p class="mt-1 text-sm text-muted">
               {p.venue && <span class="text-accent">{p.venue} {p.year}</span>}
               {p.venue ? " · " : ""}<span set:html={p.authors.replace(/(Salsabil[^,]*|Akbar)/, "<b class='text-fg'>$1</b>")} />
@@ -76,11 +103,12 @@ const selected = publications.filter((p) => p.selected);
   </section>
 
   {/* quick links */}
-  <section class="mt-16 grid gap-3 sm:grid-cols-3">
+  <section class="mt-16 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
     {[
       { href: "/repositories/", label: "Repositories", desc: "Open-source & code" },
+      { href: "/blog/", label: "Blog", desc: "Write-ups" },
       { href: "/cv/", label: "Resume", desc: "Education & experience" },
-      { href: "/teaching/", label: "Teaching", desc: "Assistantship" },
+      { href: "/activities/", label: "Activities", desc: "Teaching & talks" },
     ].map((c) => (
       <a href={c.href} class="rounded-xl border border-border bg-surface p-4 transition-colors hover:border-accent">
         <div class="font-display font-semibold text-fg">{c.label}</div>
