@@ -1,12 +1,12 @@
 ---
 import Base from "../layouts/Base.astro";
-import { education, experience, projects, awards, academicInterests, otherInterests } from "../data/cv";
+import { education, experience, academicInterests, otherInterests } from "../data/cv";
 
+// Two things deliberately live elsewhere: open-source work is fetched live on the
+// Repositories page, and awards sit with the Publications they relate to.
 const timeline = [
   { heading: "Experience", items: experience },
   { heading: "Education", items: education },
-  { heading: "Awards", items: awards },
-  { heading: "Open-source projects", items: projects },
 ];
 ---
 
@@ -53,6 +53,24 @@ const timeline = [
       </div>
     </section>
   ))}
+
+  <section class="mb-12">
+    <h2 class="mb-5 font-display text-lg font-semibold">Projects</h2>
+    <p class="text-fg/90">
+      Kept on the{" "}
+      <a href="/repositories/" class="text-accent hover:underline">Repositories</a>{" "}
+      page, refreshed straight from GitHub.
+    </p>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="mb-5 font-display text-lg font-semibold">Papers & Awards</h2>
+    <p class="text-fg/90">
+      Listed on the{" "}
+      <a href="/publications/" class="text-accent hover:underline">Papers &amp; Awards</a>{" "}
+      page.
+    </p>
+  </section>
 
   <section class="mb-12">
     <h2 class="mb-5 font-display text-lg font-semibold">Academic interests</h2>

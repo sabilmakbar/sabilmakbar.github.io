@@ -28,7 +28,7 @@ export const scholar = [
 
 export const nav = [
   { label: "About", href: "/about/" },
-  { label: "Publications", href: "/publications/" },
+  { label: "Papers & Awards", href: "/publications/" },
   { label: "Repositories", href: "/repositories/" },
   { label: "Blog", href: "/blog/" },
   { label: "Resume", href: "/cv/" },
