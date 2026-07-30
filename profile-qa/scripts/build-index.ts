@@ -105,6 +105,7 @@ push(
 
 // --- write ---------------------------------------------------------------
 const here = dirname(fileURLToPath(import.meta.url));
-const out = resolve(here, "../worker/src/index.json");
+// optional arg lets tests write elsewhere and diff without touching the real file
+const out = process.argv[2] ? resolve(process.argv[2]) : resolve(here, "../worker/src/index.json");
 writeFileSync(out, JSON.stringify(chunks, null, 0) + "\n");
 console.log(`wrote ${chunks.length} chunks -> ${out}`);

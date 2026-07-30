@@ -86,6 +86,29 @@ npm run preview        # serves the built dist/ locally to check it
 
 ---
 
+## 4b. Tests
+
+```bash
+npm test      # builds the site, then runs the checks
+```
+
+No test framework is installed; this uses Node's built-in runner. The suite checks
+the things that are costly to get wrong:
+
+- **Privacy:** no phone numbers or absolute money figures in `src/data`, in the QA
+  index, or in any built page.
+- **QA index freshness:** regenerating from `src/data` must reproduce the committed
+  `index.json`. This fails if you edited content but forgot `npm run build:index`.
+- **Data sanity:** experience is reverse-chronological, exactly one current role,
+  career start stays Nov 2020 (the chatbot derives years of experience from it),
+  publications have titles/authors/https links, awards are complete.
+- **Interests stay separate from skills:** Explainable AI and Causal Inference must
+  not appear in the tech-stack list, since they are interests rather than experience.
+- **Links:** every internal link in the built site resolves, and every nav item has
+  a page.
+- **Chat widget:** absent on the landing page, present on content pages, and using
+  the same `transition:persist` name everywhere so conversations survive navigation.
+
 ## 5. Update content
 
 All content lives in `src/data/`. Edit the relevant file, then regenerate the QA

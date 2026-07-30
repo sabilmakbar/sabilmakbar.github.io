@@ -69,6 +69,11 @@ Rule of thumb: after any `src/data` edit that touches CV, profile, or
 publications, run `npm run build:index` and redeploy the worker so the chatbot
 stays in sync with the site.
 
+`npm test` (Node's built-in runner, no framework installed) enforces that rule
+and the privacy rules below: it fails if the QA index is stale, if a phone number
+or absolute money figure appears anywhere public, or if an internal link breaks.
+Tests live in `tests/`.
+
 ## Privacy and curation rules
 
 - **Never** put phone numbers, home address, or absolute financial figures into
