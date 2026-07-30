@@ -1,0 +1,33 @@
+name: Tests
+
+# Validates changes before they reach master. Pushes to master are covered by the
+# deploy workflow, which runs the same checks before publishing.
+on:
+  pull_request:
+  push:
+    branches-ignore: [master]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Data and privacy checks need no build, so run them first and fail fast.
+      - run: npm run test:data
+
+      # Full suite: builds the site, then checks the built output too.
+      - run: npm test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

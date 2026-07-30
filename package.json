@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "build:index": "node --experimental-strip-types profile-qa/scripts/build-index.ts",
+    "test:data": "node --test --experimental-strip-types tests/content.test.ts",
     "pretest": "astro build",
     "test": "node --test --experimental-strip-types tests/*.test.ts",
     "preview": "astro preview",
