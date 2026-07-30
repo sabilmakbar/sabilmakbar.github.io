@@ -133,7 +133,7 @@ const path = Astro.url.pathname;
     {cfAnalyticsToken && (
       <script
         is:inline
-        defer
+        type="module"
         src="https://static.cloudflareinsights.com/beacon.min.js"
         data-cf-beacon={`{"token": "${cfAnalyticsToken}"}`}
       ></script>
