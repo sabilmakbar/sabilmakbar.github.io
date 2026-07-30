@@ -12,6 +12,7 @@ import { profile } from "../../src/data/profile.ts";
 import { about } from "../../src/data/about.ts";
 import { education, experience, projects, awards, academicInterests, otherInterests } from "../../src/data/cv.ts";
 import { publications } from "../../src/data/publications.ts";
+import { teaching } from "../../src/data/activities.ts";
 
 const stripHtml = (s: string) => s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 
@@ -63,6 +64,16 @@ for (const e of experience) {
 for (const ed of education) {
   push("cv:education", `${ed.title}, ${ed.org} (${ed.year}). ` + ed.points.join(". ") + ".");
 }
+// --- teaching, mentoring, talks ------------------------------------------
+push(
+  "activities:teaching:overview",
+  "Teaching, mentoring, instructing, and speaking experience of Salsabil Maulana Akbar (Sabil), alongside his main roles: " +
+    teaching.map((t) => `${t.what} at ${t.where} (${t.when})`).join("; ") + ".",
+);
+for (const t of teaching) {
+  push(`activities:teaching:${t.where}`, `${t.what} at ${t.where} (${t.when}). ${t.detail}`);
+}
+
 push(
   "cv:awards",
   "Awards and honours won by Salsabil Maulana Akbar (Sabil): " +
