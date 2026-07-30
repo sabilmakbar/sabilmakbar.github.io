@@ -74,6 +74,29 @@ describe("built site", () => {
     assert.ok(readFileSync(join(dist, "about/index.html"), "utf8").includes("pqa-root"));
   });
 
+  test("analytics beacon matches whether a token was set at build time", () => {
+    const token = (process.env.CF_ANALYTICS_TOKEN ?? "").trim();
+    const html = readFileSync(join(dist, "about/index.html"), "utf8");
+    const hasBeacon = html.includes("static.cloudflareinsights.com/beacon.min.js");
+    if (token) {
+      assert.ok(hasBeacon, "CF_ANALYTICS_TOKEN is set but no beacon was emitted");
+      assert.ok(html.includes(token), "beacon is missing the site token");
+    } else {
+      // no token means no third-party request at all
+      assert.ok(!hasBeacon, "beacon emitted without a token being set");
+    }
+  });
+
+  test("no third-party scripts beyond the optional analytics beacon", () => {
+    const allowed = ["static.cloudflareinsights.com"];
+    for (const file of htmlFiles(dist)) {
+      const srcs = [...readFileSync(file, "utf8").matchAll(/<script[^>]+src="https:\/\/([^/"]+)/g)].map((m) => m[1]);
+      for (const host of new Set(srcs)) {
+        assert.ok(allowed.includes(host), `unexpected third-party script from ${host} in ${file.replace(dist, "dist")}`);
+      }
+    }
+  });
+
   test("the chat widget persists across navigation", () => {
     // same persist name on every page, otherwise the conversation is lost
     for (const page of ["about", "cv", "publications", "repositories", "activities", "blog"]) {

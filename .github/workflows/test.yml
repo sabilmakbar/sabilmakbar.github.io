@@ -31,3 +31,5 @@ jobs:
       - run: npm test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # optional: unset means no analytics beacon is emitted
+          CF_ANALYTICS_TOKEN: ${{ secrets.CF_ANALYTICS_TOKEN }}

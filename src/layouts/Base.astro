@@ -4,6 +4,11 @@ import { ClientRouter } from "astro:transitions";
 import { profile, nav } from "../data/profile";
 import ChatWidget from "../components/ChatWidget.astro";
 
+// Optional privacy-friendly analytics (Cloudflare Web Analytics), same convention
+// as the relo-calculator: set CF_ANALYTICS_TOKEN in the build environment to
+// enable; unset means no script is emitted and no third-party request is made.
+const cfAnalyticsToken = (process.env.CF_ANALYTICS_TOKEN ?? "").trim();
+
 const { title, description, hideChat = false, hideFooter = false } = Astro.props;
 const pageTitle = title ? `${title} · ${profile.short}` : `${profile.name} · ${profile.tagline}`;
 const desc = description ?? profile.blurb;
@@ -124,6 +129,15 @@ const path = Astro.url.pathname;
     )}
 
     {!hideChat && <ChatWidget />}
+
+    {cfAnalyticsToken && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={`{"token": "${cfAnalyticsToken}"}`}
+      ></script>
+    )}
 
     <script>
       // Header controls are re-rendered on each view-transition navigation, so

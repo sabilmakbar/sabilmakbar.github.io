@@ -216,6 +216,27 @@ at one specific deployed worker. Two things to change when replicating:
 Also change `name` in `wrangler.toml` (worker name) and, if you use the QA log,
 create your own D1 database and update `database_id`.
 
+## 6d. Analytics (optional)
+
+The site can emit a Cloudflare Web Analytics beacon. It is off unless a token is
+present, so by default the site makes no third-party script requests at all.
+
+To enable it:
+
+1. In the Cloudflare dashboard, open **Web Analytics**, add a site for
+   `sabilmakbar.github.io`, and copy the **site token**.
+2. Add it as a GitHub Actions secret named `CF_ANALYTICS_TOKEN`.
+
+The next deploy picks it up. Locally you can preview it with:
+
+```bash
+CF_ANALYTICS_TOKEN=yourtoken npm run build
+```
+
+Same convention as the relo-calculator project: unset means no beacon. The token
+is public by design, since it ships in the page and only identifies the site.
+Cloudflare Web Analytics sets no cookies and does not track visitors across sites.
+
 ## 7. Secrets and configuration
 
 - **GitHub Actions:** `GITHUB_TOKEN` is provided automatically by Actions; no
