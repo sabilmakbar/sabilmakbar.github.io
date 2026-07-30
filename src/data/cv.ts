@@ -70,6 +70,24 @@ export const experience = [
   },
 ];
 
+export const awards = [
+  {
+    title: "Best Resource Paper, NusaWrites",
+    org: "AACL",
+    year: "2023",
+  },
+  {
+    title: "Top 1-3%, Telkomsel Indonesia Data Science Competition",
+    org: "Jakarta, Indonesia",
+    year: "2021",
+  },
+  {
+    title: "Bronze Award, Regional Quant Challenge",
+    org: "WorldQuant, Jakarta, Indonesia",
+    year: "2019",
+  },
+];
+
 export const projects = [
   {
     title: "ID ASR Dataset Generator",

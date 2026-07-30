@@ -10,7 +10,7 @@ import { dirname, resolve } from "node:path";
 
 import { profile } from "../../src/data/profile.ts";
 import { about } from "../../src/data/about.ts";
-import { education, experience, projects, academicInterests, otherInterests } from "../../src/data/cv.ts";
+import { education, experience, projects, awards, academicInterests, otherInterests } from "../../src/data/cv.ts";
 import { publications } from "../../src/data/publications.ts";
 
 const stripHtml = (s: string) => s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
@@ -63,6 +63,11 @@ for (const e of experience) {
 for (const ed of education) {
   push("cv:education", `${ed.title}, ${ed.org} (${ed.year}). ` + ed.points.join(". ") + ".");
 }
+push(
+  "cv:awards",
+  "Awards and honours won by Salsabil Maulana Akbar (Sabil): " +
+    awards.map((a) => `${a.title} (${a.org}, ${a.year})`).join("; ") + ".",
+);
 push(
   "cv:projects",
   "Open-source projects by Sabil: " +
