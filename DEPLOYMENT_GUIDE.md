@@ -158,11 +158,46 @@ You can also trigger a build manually from the Actions tab ("Run workflow"). A
 weekly scheduled run refreshes the auto-fetched GitHub repo data even if you
 push nothing.
 
+### QA worker (automatic, once a token is configured)
+
+Pushing a change under `profile-qa/worker/` (including the generated
+`index.json`) triggers the **Deploy QA worker** workflow. It has three fail-safes:
+
+1. **Refuses a stale index.** It runs the data checks first, so it will not ship a
+   worker whose `index.json` disagrees with `src/data`.
+2. **Health check after deploying.** It polls `/health` and requires the live chunk
+   count to match the committed index, retrying for about a minute while
+   Cloudflare propagates.
+3. **Automatic rollback.** If the deploy succeeded but the health check failed, it
+   rolls back to the version that was live before. It records that version id
+   *before* deploying, and the rollback step only runs when the deploy itself
+   succeeded, so a failure earlier in the run can never revert a good version.
+
+If no `CLOUDFLARE_API_TOKEN` is configured the workflow skips with a notice
+instead of failing, which keeps forks green.
+
+One-time setup:
+
+1. In Cloudflare, create an API token using the **Edit Cloudflare Workers**
+   template, and add **D1: Edit** for the same account (the worker has a D1
+   binding).
+2. Add it to GitHub as a secret named `CLOUDFLARE_API_TOKEN`.
+
 ### QA worker (manual)
+
+Still works, and is the fallback if the workflow is unavailable:
 
 ```bash
 cd profile-qa/worker
 npx wrangler deploy      # or: npm run deploy
+```
+
+To roll back by hand:
+
+```bash
+cd profile-qa/worker
+npx wrangler deployments list          # find the version you want
+npx wrangler rollback <version-id> -y -m "reason"
 ```
 
 This uploads the worker and its `index.json`. The live endpoint is

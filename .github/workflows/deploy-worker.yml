@@ -1,0 +1,114 @@
+name: Deploy QA worker
+
+# The chatbot is a separate service from the site, so it gets its own workflow.
+# It only runs when the worker (including its generated index.json) changes.
+on:
+  push:
+    branches: [master]
+    paths:
+      - "profile-qa/worker/**"
+      - ".github/workflows/deploy-worker.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+# Never overlap worker deploys; a half-applied rollback would be worse than waiting.
+concurrency:
+  group: worker-deploy
+  cancel-in-progress: false
+
+env:
+  WORKER_URL: https://profile-qa-cf.maulana-1998.workers.dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      # Forks and a not-yet-configured repo should skip quietly rather than fail.
+      - id: guard
+        run: |
+          if [ -z "${CF_TOKEN}" ]; then
+            echo "::notice::No CLOUDFLARE_API_TOKEN configured, skipping worker deploy."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      # Fail-safe 1: refuse to deploy an index that does not match src/data.
+      # No install needed; these checks use Node's built-in test runner only.
+      - name: Verify the index matches src/data
+        if: steps.guard.outputs.skip != 'true'
+        run: npm run test:data
+
+      - name: Install wrangler
+        if: steps.guard.outputs.skip != 'true'
+        working-directory: profile-qa/worker
+        run: npm ci
+
+      # Fail-safe 2: remember the live version so we can put it back.
+      - id: current
+        name: Record the currently live version
+        if: steps.guard.outputs.skip != 'true'
+        working-directory: profile-qa/worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          PREV=$(npx wrangler deployments list 2>/dev/null \
+            | grep -oE '\(100%\) [0-9a-f-]{36}' | tail -1 | awk '{print $2}')
+          echo "live version: ${PREV:-unknown}"
+          echo "version=$PREV" >> "$GITHUB_OUTPUT"
+
+      - id: deploy
+        name: Deploy
+        if: steps.guard.outputs.skip != 'true'
+        working-directory: profile-qa/worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx wrangler deploy
+
+      # Fail-safe 3: prove the new version actually serves the expected index.
+      # Cloudflare needs a moment to propagate, so retry before giving up.
+      - name: Health check
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          EXPECTED=$(node -e "console.log(require('./profile-qa/worker/src/index.json').length)")
+          # Guard against an empty value, otherwise "" = "" would look healthy.
+          case "$EXPECTED" in
+            ''|*[!0-9]*) echo "::error::Could not read the chunk count"; exit 1 ;;
+          esac
+          [ "$EXPECTED" -gt 0 ] || { echo "::error::Index is empty"; exit 1; }
+          echo "expecting $EXPECTED chunks"
+          for i in $(seq 1 6); do
+            sleep 10
+            BODY=$(curl -sf --max-time 20 "$WORKER_URL/health" || true)
+            echo "attempt $i: ${BODY:-<no response>}"
+            ACTUAL=$(printf '%s' "$BODY" | node -e "
+              let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{
+                try { console.log(JSON.parse(d).chunks) } catch { console.log('') }
+              })")
+            if [ -n "$ACTUAL" ] && [ "$ACTUAL" = "$EXPECTED" ]; then
+              echo "healthy: $ACTUAL chunks live"
+              exit 0
+            fi
+          done
+          echo "::error::Health check failed. Expected $EXPECTED chunks."
+          exit 1
+
+      # Only rolls back when the deploy itself succeeded but a later check failed,
+      # so a failure before deploying can never revert a good version.
+      - name: Roll back a bad deploy
+        if: failure() && steps.deploy.outcome == 'success' && steps.current.outputs.version != ''
+        working-directory: profile-qa/worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          echo "::warning::Rolling back to ${{ steps.current.outputs.version }}"
+          npx wrangler rollback "${{ steps.current.outputs.version }}" -y \
+            -m "CI health check failed, reverting"
