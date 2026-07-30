@@ -18,7 +18,7 @@ export const about = {
     },
     {
       label: "Experiment Design & Impact Measurement",
-      text: "Designed experiments and A/B tests, and measured the quantitative impact of model changes on relevance, conversion, and key business metrics at scale.",
+      text: "Designed evaluation setups and measured the quantitative impact of model changes on relevance, conversion, and key business metrics at scale.",
     },
     {
       label: "Generative AI & Voice",
@@ -53,6 +53,10 @@ export const about = {
     {
       group: "Proptech (Pashouses)",
       items: "Multimodal modeling (tabular, text, image), ETL pipelines, GCP",
+    },
+    {
+      group: "Mathematics & teaching",
+      items: "Applied mathematics, statistics, MATLAB, R",
     },
   ],
 };

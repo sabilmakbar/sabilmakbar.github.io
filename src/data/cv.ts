@@ -4,6 +4,7 @@ export const education = [
     org: "Bandung Institute of Technology (ITB)",
     year: "2016-2020",
     points: [
+      "Thesis: Computational Fluid Dynamics for Wave Propagation using the Shallow Water Equation",
       "Focus area in Applied Mathematics (Optimization, PDE, Financial Mathematics)",
       "Core math coursework: Linear Algebra, Real & Complex Analysis, Multivariable Calculus",
       "Intermediate statistics: Probability Theory, Mathematical Statistics",

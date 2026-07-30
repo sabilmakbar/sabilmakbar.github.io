@@ -1,11 +1,12 @@
 // Teaching, mentoring, and talks. Kept as data so the QA index can read it too.
 export const teaching = [
   {
-    where: "START Summit, Tokopedia",
-    what: "Mentor & Instructor",
+    where: "START Summit (Data Track), Tokopedia",
+    what: "Speaker",
     when: "Oct 2023",
     detail:
-      "Prepared and delivered sessions on my work in search retrieval and product pre-filtering.",
+      "Prepared and delivered sessions on my work in search retrieval and product pre-filtering, titled " +
+      "\"Enhancing User Search Experience using Query-Category Filtering\".",
   },
   {
     where: "Tokopedia",
