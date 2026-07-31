@@ -59,9 +59,15 @@ jobs:
         working-directory: profile-qa/worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # avoids a /memberships lookup, which the token is not scoped for
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           PREV=$(npx wrangler deployments list 2>/dev/null \
             | grep -oE '\(100%\) [0-9a-f-]{36}' | tail -1 | awk '{print $2}')
+          if [ -z "$PREV" ]; then
+            # Not fatal, but say so: without it a bad deploy cannot be rolled back.
+            echo "::warning::Could not read the live version, rollback will be unavailable."
+          fi
           echo "live version: ${PREV:-unknown}"
           echo "version=$PREV" >> "$GITHUB_OUTPUT"
 
@@ -71,6 +77,8 @@ jobs:
         working-directory: profile-qa/worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # avoids a /memberships lookup, which the token is not scoped for
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler deploy
 
       # Fail-safe 3: prove the new version actually serves the expected index.
@@ -108,6 +116,8 @@ jobs:
         working-directory: profile-qa/worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # avoids a /memberships lookup, which the token is not scoped for
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           echo "::warning::Rolling back to ${{ steps.current.outputs.version }}"
           npx wrangler rollback "${{ steps.current.outputs.version }}" -y \
