@@ -35,17 +35,17 @@ export const teaching = [
       "Taught Mathematics for Machine Learning and mentored cohorts on computer vision and NLP applications for their capstone projects.",
   },
   {
+    where: "Statistics Department, Universitas Padjadjaran",
+    what: "Workshop instructor",
+    when: "Nov 2018",
+    detail: "Delivered a workshop on Statistics and Data Analysis with R.",
+  },
+  {
     where: "Various private institutions (self-employed)",
     what: "Tutor",
     when: "Aug 2018 - May 2021",
     detail:
       "Tutored first and second year students across Business Mathematics, Calculus, Linear Algebra, and Statistics.",
-  },
-  {
-    where: "Statistics Department, Universitas Padjadjaran",
-    what: "Workshop instructor",
-    when: "Aug 2018 - Dec 2019",
-    detail: "Delivered a workshop on Statistics and Data Analysis with R.",
   },
   {
     where: "Mathematics, ITB",
