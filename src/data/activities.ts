@@ -18,7 +18,7 @@ export const teaching = [
   {
     where: "Institut Teknologi Kalimantan",
     what: "Speaker",
-    when: "Aug 2022 - Nov 2022",
+    when: "Aug 2022",
     detail: "Gave a talk on career prospects in the data field from a mathematics perspective.",
   },
   {
