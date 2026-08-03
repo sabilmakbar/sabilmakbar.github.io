@@ -94,6 +94,17 @@ describe("experience", () => {
     assert.equal(current.length, 1);
   });
 
+  test("bullets carry no quantified achievement claims", () => {
+    // Impact is described qualitatively on the site; the figures stay in the CV.
+    // Award titles are exempt, since "Top 1-3%" is the name of the award itself.
+    for (const e of experience) {
+      for (const p of e.points) {
+        assert.ok(!/\d+(\.\d+)?\s?%/.test(p), `percentage figure in ${e.org}: "${p.slice(0, 60)}..."`);
+        assert.ok(!/\d+-fold/.test(p), `multiplier figure in ${e.org}: "${p.slice(0, 60)}..."`);
+      }
+    }
+  });
+
   test("every role has a title, org and at least one bullet", () => {
     for (const e of experience) {
       assert.ok(e.title && e.org, "role missing title or org");
