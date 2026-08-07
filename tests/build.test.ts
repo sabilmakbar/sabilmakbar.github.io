@@ -83,14 +83,21 @@ describe("built site", () => {
   });
 
   test("descriptions stay within what search and social actually show", () => {
-    // Google truncates near 160 characters; link previews often near 125.
+    // Different consumers, different limits: search snippets run to about 160
+    // characters, link previews truncate near 125.
+    const limits: [RegExp, number, string][] = [
+      [/name="description" content="([^"]+)"/, 160, "search"],
+      [/property="og:description" content="([^"]+)"/, 125, "link preview"],
+      [/name="twitter:description" content="([^"]+)"/, 125, "link preview"],
+    ];
     for (const file of htmlFiles(dist)) {
       const html = readFileSync(file, "utf8");
       const where = file.replace(dist, "dist");
-      for (const pat of [/name="description" content="([^"]+)"/, /property="og:description" content="([^"]+)"/]) {
-        const text = html.match(pat)?.[1] ?? "";
+      for (const [pat, max, label] of limits) {
+        // entities expand back to one character when rendered
+        const text = (html.match(pat)?.[1] ?? "").replace(/&amp;/g, "&").replace(/&#39;/g, "'");
         assert.ok(text.length > 0, `empty description on ${where}`);
-        assert.ok(text.length <= 160, `description is ${text.length} chars on ${where}, keep it under 160`);
+        assert.ok(text.length <= max, `${label} description is ${text.length} chars on ${where}, max ${max}`);
       }
     }
   });

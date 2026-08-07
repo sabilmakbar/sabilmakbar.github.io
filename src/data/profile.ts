@@ -8,10 +8,13 @@ export const profile = {
   email: "maulana.1998@yahoo.co.id",
   avatar: "/img/profile.png",
   avatarAlt: "/img/profile-alt.jpg",
-  // Short on purpose: search results truncate near 160 characters and link
-  // previews near 125. The longer `blurb` below is for reading on the page.
+  // Two lengths because the consumers differ: search snippets run to about 160
+  // characters, link previews truncate near 125. The longer `blurb` below is
+  // what actually gets read on the page.
   metaDescription:
     "AI & Machine Learning Engineer working on NLP, Speech, and Information Retrieval. Ask this site anything about my work, research, and background.",
+  socialDescription:
+    "AI & ML Engineer in NLP, Speech, and Information Retrieval. Ask this site anything about my background.",
   blurb:
     "AI professional with ~5 years of experience in Data Science & Machine Learning, applying a strong " +
     "mathematics foundation to deliver end-to-end AI solutions across NLP, Speech, Computer Vision, and " +
