@@ -65,6 +65,30 @@ describe("built site", () => {
     assert.deepEqual(broken, [], "missing assets");
   });
 
+  test("every page carries link-preview tags with absolute URLs", () => {
+    for (const file of htmlFiles(dist)) {
+      const html = readFileSync(file, "utf8");
+      const where = file.replace(dist, "dist");
+      for (const prop of ["og:title", "og:description", "og:url", "og:image", "og:type"]) {
+        assert.match(html, new RegExp(`property="${prop}" content="[^"]+"`), `missing ${prop} on ${where}`);
+      }
+      assert.match(html, /name="twitter:card" content="summary_large_image"/, `no twitter card on ${where}`);
+      // scrapers do not resolve relative paths
+      const url = html.match(/property="og:url" content="([^"]+)"/)?.[1] ?? "";
+      const img = html.match(/property="og:image" content="([^"]+)"/)?.[1] ?? "";
+      assert.match(url, /^https:\/\//, `og:url is not absolute on ${where}`);
+      assert.match(img, /^https:\/\//, `og:image is not absolute on ${where}`);
+      assert.match(html, /rel="canonical" href="https:\/\//, `no canonical on ${where}`);
+    }
+  });
+
+  test("the preview image is actually shipped", () => {
+    const html = readFileSync(join(dist, "index.html"), "utf8");
+    const img = html.match(/property="og:image" content="[^"]*(\/img\/[^"]+)"/)?.[1] ?? "";
+    assert.ok(img, "could not read the og:image path");
+    assert.ok(existsSync(join(dist, img.replace(/^\//, ""))), `og:image missing from the build: ${img}`);
+  });
+
   test("every page declares a language and a viewport", () => {
     for (const file of htmlFiles(dist)) {
       const html = readFileSync(file, "utf8");
