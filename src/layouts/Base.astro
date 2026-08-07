@@ -11,7 +11,7 @@ const cfAnalyticsToken = (process.env.CF_ANALYTICS_TOKEN ?? "").trim();
 
 const { title, description, hideChat = false, hideFooter = false } = Astro.props;
 const pageTitle = title ? `${title} · ${profile.short}` : `${profile.name} · ${profile.tagline}`;
-const desc = description ?? profile.blurb;
+const desc = description ?? profile.metaDescription;
 const path = Astro.url.pathname;
 
 // Link previews (LinkedIn, Slack, WhatsApp) need absolute URLs, so they are built

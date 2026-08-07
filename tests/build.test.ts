@@ -82,6 +82,19 @@ describe("built site", () => {
     }
   });
 
+  test("descriptions stay within what search and social actually show", () => {
+    // Google truncates near 160 characters; link previews often near 125.
+    for (const file of htmlFiles(dist)) {
+      const html = readFileSync(file, "utf8");
+      const where = file.replace(dist, "dist");
+      for (const pat of [/name="description" content="([^"]+)"/, /property="og:description" content="([^"]+)"/]) {
+        const text = html.match(pat)?.[1] ?? "";
+        assert.ok(text.length > 0, `empty description on ${where}`);
+        assert.ok(text.length <= 160, `description is ${text.length} chars on ${where}, keep it under 160`);
+      }
+    }
+  });
+
   test("the preview image is actually shipped", () => {
     const html = readFileSync(join(dist, "index.html"), "utf8");
     const img = html.match(/property="og:image" content="[^"]*(\/img\/[^"]+)"/)?.[1] ?? "";
