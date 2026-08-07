@@ -92,8 +92,14 @@ npm run preview        # serves the built dist/ locally to check it
 npm test      # builds the site, then runs the checks
 ```
 
-No test framework is installed; this uses Node's built-in runner. The suite checks
-the things that are costly to get wrong:
+No test framework is installed; this uses Node's built-in runner. Three files:
+
+- `tests/content.test.ts` needs no build, so `npm run test:data` runs it alone.
+- `tests/worker.test.ts` exercises the QA worker outside the Workers runtime, with
+  stand-ins for the AI and D1 bindings. It also needs no build.
+- `tests/build.test.ts` checks the built output in `dist/`.
+
+The suite checks the things that are costly to get wrong:
 
 - **Privacy:** no phone numbers or absolute money figures in `src/data`, in the QA
   index, or in any built page.
@@ -108,6 +114,15 @@ the things that are costly to get wrong:
   a page.
 - **Chat widget:** absent on the landing page, present on content pages, and using
   the same `transition:persist` name everywhere so conversations survive navigation.
+- **Worker behaviour:** the origin allowlist (including per-deployment overrides),
+  rate limiting and its `Retry-After`, that callers are keyed by a hash rather than
+  a raw IP, that a database outage fails open, that conversation history is replayed
+  but bounded, that today's date reaches the prompt, and that bad input is rejected
+  rather than crashing.
+- **House style and consistency:** no em dashes, no placeholder text, the current
+  employer stays anonymised, no duplicate entries, teaching dates are well-formed
+  and reverse-chronological, no future dates, every referenced image exists, and
+  every social icon has an implementation.
 
 ## 5. Update content
 

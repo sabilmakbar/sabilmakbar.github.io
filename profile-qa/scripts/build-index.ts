@@ -25,7 +25,7 @@ push("about:headline", `Current focus of Salsabil Maulana Akbar (Sabil): ${profi
 push("about:bio", about.summary);
 for (const c of about.coreExperience) push(`about:core:${c.label}`, `${c.label}: ${c.text}`);
 for (const c of about.exploring)
-  push(`about:interest:${c.label}`, `Interest and future direction (not past industry work) — ${c.label}: ${c.text}`);
+  push(`about:interest:${c.label}`, `Interest and future direction (not past industry work), ${c.label}: ${c.text}`);
 push(
   "about:keywords",
   "Keywords, domains, and tech stack for Sabil: " + about.keywords.map((k) => `${k.group}: ${k.items}`).join("; ") + ".",
@@ -82,10 +82,10 @@ push(
 push(
   "cv:projects",
   "Open-source projects by Sabil: " +
-    projects.map((p) => `${p.title} (${p.year}) — ${p.points.map(stripHtml).join("; ")}`).join(". ") + ".",
+    projects.map((p) => `${p.title} (${p.year}): ${p.points.map(stripHtml).join("; ")}`).join(". ") + ".",
 );
 for (const a of academicInterests) {
-  push("cv:academic-interests", `Academic interest — ${a.title}: ` + a.items.join("; ") + ".");
+  push("cv:academic-interests", `Academic interest, ${a.title}: ` + a.items.join("; ") + ".");
 }
 push("cv:other-interests", "Other interests of Sabil: " + otherInterests.map(stripHtml).join("; ") + ".");
 
