@@ -166,6 +166,111 @@ describe("profile and about", () => {
   });
 });
 
+describe("house style", () => {
+  test("no em dashes in authored content", () => {
+    // They read as machine-written, so the site uses commas or full stops instead.
+    for (const { name, text } of dataFiles) {
+      assert.ok(!text.includes("—"), `em dash in ${name}`);
+    }
+    assert.ok(!readFileSync(INDEX, "utf8").includes("—"), "em dash in the QA index");
+  });
+
+  test("no placeholder text left behind", () => {
+    const PLACEHOLDER = /\b(TODO|FIXME|TBD|lorem ipsum|coming soon here|xxx)\b/i;
+    for (const { name, text } of dataFiles) {
+      assert.ok(!PLACEHOLDER.test(text), `placeholder text in ${name}`);
+    }
+  });
+
+  test("the current employer stays anonymised", () => {
+    // Deliberate: the CV names it, the public site does not. If this is ever
+    // revealed on purpose, update this test in the same change.
+    assert.match(experience[0].org, /Stealth/i);
+  });
+});
+
+describe("no duplicate entries", () => {
+  const dupes = (xs: string[]) => xs.filter((x, i) => xs.indexOf(x) !== i);
+
+  test("publications are unique", () => {
+    assert.deepEqual(dupes(publications.map((p) => p.title)), []);
+  });
+
+  test("awards are unique", () => {
+    assert.deepEqual(dupes(awards.map((a) => `${a.title}|${a.year}`)), []);
+  });
+
+  test("teaching entries are unique", () => {
+    assert.deepEqual(dupes(teaching.map((t) => `${t.where}|${t.when}`)), []);
+  });
+
+  test("nav labels and hrefs are unique", () => {
+    assert.deepEqual(dupes(nav.map((n) => n.label)), []);
+    assert.deepEqual(dupes(nav.map((n) => n.href)), []);
+  });
+});
+
+describe("dates", () => {
+  const MONTH = "(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)";
+  const ONE_OFF = new RegExp(`^${MONTH} \\d{4}$`);
+  const RANGE = new RegExp(`^${MONTH} \\d{4} - (${MONTH} \\d{4}|present)$`);
+  const startOf = (s: string) => Date.parse(`1 ${s.split(" - ")[0]}`.replace("Sept", "Sep"));
+
+  test("teaching dates are either a single month or a month range", () => {
+    for (const t of teaching) {
+      assert.ok(ONE_OFF.test(t.when) || RANGE.test(t.when), `unrecognised date on ${t.where}: "${t.when}"`);
+    }
+  });
+
+  test("teaching is listed newest first", () => {
+    const starts = teaching.map((t) => startOf(t.when));
+    for (const s of starts) assert.ok(!Number.isNaN(s), "unparseable teaching date");
+    assert.deepEqual(starts, [...starts].sort((a, b) => b - a), "teaching should be reverse-chronological");
+  });
+
+  test("no date is in the future", () => {
+    const now = Date.now();
+    for (const t of teaching) assert.ok(startOf(t.when) <= now, `future date on ${t.where}`);
+    for (const e of experience) assert.ok(startOf(e.year) <= now, `future date on ${e.org}`);
+  });
+});
+
+describe("assets referenced by data exist", () => {
+  test("both profile photos are present", () => {
+    for (const p of [profile.avatar, (profile as any).avatarAlt]) {
+      assert.ok(existsSync(join(root, "public", p.replace(/^\//, ""))), `missing image: ${p}`);
+    }
+  });
+
+  test("every icon used has an implementation", () => {
+    const icon = readFileSync(join(root, "src/components/Icon.astro"), "utf8");
+    for (const s of [...profile.social, ...scholar]) {
+      assert.ok(icon.includes(`name === "${s.icon}"`), `Icon.astro has no case for "${s.icon}"`);
+    }
+  });
+});
+
+describe("blog posts", () => {
+  const dir = join(root, "src/content/blog");
+  const posts = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith(".md")) : [];
+
+  test("each post has the frontmatter the schema requires", () => {
+    for (const f of posts) {
+      const fm = readFileSync(join(dir, f), "utf8").split("---")[1] ?? "";
+      for (const key of ["title:", "date:", "summary:"]) {
+        assert.ok(fm.includes(key), `${f} is missing ${key}`);
+      }
+      const date = fm.match(/date:\s*(\S+)/)?.[1] ?? "";
+      assert.ok(!Number.isNaN(Date.parse(date)), `${f} has an unparseable date: ${date}`);
+    }
+  });
+
+  test("post filenames are unique slugs", () => {
+    const slugs = posts.map((f) => f.replace(/\.md$/, ""));
+    assert.deepEqual(slugs.filter((s, i) => slugs.indexOf(s) !== i), []);
+  });
+});
+
 describe("navigation", () => {
   test("every nav link resolves to a page", () => {
     for (const item of nav) {

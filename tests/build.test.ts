@@ -51,6 +51,44 @@ describe("built site", () => {
     assert.deepEqual(broken, [], "broken internal links");
   });
 
+  test("every image and asset reference resolves", () => {
+    const broken: string[] = [];
+    for (const file of htmlFiles(dist)) {
+      const html = readFileSync(file, "utf8");
+      const refs = [...html.matchAll(/(?:src|href)="(\/[^"#?]+\.(?:png|jpe?g|svg|ico|webp|css|js))"/g)].map((m) => m[1]);
+      for (const ref of new Set(refs)) {
+        if (!existsSync(join(dist, ref.replace(/^\//, "")))) {
+          broken.push(`${file.replace(dist, "dist")} -> ${ref}`);
+        }
+      }
+    }
+    assert.deepEqual(broken, [], "missing assets");
+  });
+
+  test("every page declares a language and a viewport", () => {
+    for (const file of htmlFiles(dist)) {
+      const html = readFileSync(file, "utf8");
+      assert.match(html, /<html[^>]+lang="/, `no lang on ${file.replace(dist, "dist")}`);
+      assert.match(html, /name="viewport"/, `no viewport on ${file.replace(dist, "dist")}`);
+    }
+  });
+
+  test("the landing page stays chrome-free", () => {
+    // hideChat and hideFooter are what make it feel like a single ask box
+    const html = readFileSync(join(dist, "index.html"), "utf8");
+    assert.ok(!html.includes("Contact me by Email"), "the footer leaked onto the landing page");
+    assert.ok(html.includes("ask-form"), "the ask box is missing");
+  });
+
+  test("dark mode styles ship", () => {
+    const css = readdirSync(join(dist, "_astro"))
+      .filter((f) => f.endsWith(".css"))
+      .map((f) => readFileSync(join(dist, "_astro", f), "utf8"))
+      .join("");
+    assert.match(css, /\.dark/, "no dark mode rules found");
+    assert.match(css, /--accent/, "design tokens are missing");
+  });
+
   test("no page leaks a phone number", () => {
     const PHONE = /\+?\d[\d\s().-]{8,}\d/;
     for (const file of htmlFiles(dist)) {
