@@ -63,6 +63,27 @@ describe("QA index stays in sync with src/data", () => {
     );
   });
 
+  test("the corpus carries no instruction-like text", () => {
+    // Retrieved chunks are pasted into the prompt, so anything imperative in the
+    // source data would become an instruction the model may follow. The content
+    // is ours, but this catches a poisoned edit arriving through a change.
+    const INSTRUCTIONS = [
+      /ignore (all )?(previous|prior|above)/i,
+      /disregard (the )?(above|previous)/i,
+      /you are (now )?(an?|unrestricted|in developer mode)/i,
+      /system prompt/i,
+      /reveal your/i,
+      /act as (an?|if)/i,
+      /do not follow/i,
+    ];
+    const chunks = JSON.parse(readFileSync(INDEX, "utf8"));
+    for (const c of chunks) {
+      for (const pattern of INSTRUCTIONS) {
+        assert.ok(!pattern.test(c.text), `instruction-like text in ${c.source}: ${pattern}`);
+      }
+    }
+  });
+
   test("every chunk has a source and non-empty text", () => {
     const chunks = JSON.parse(readFileSync(INDEX, "utf8"));
     assert.ok(chunks.length > 0);
