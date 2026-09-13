@@ -187,7 +187,11 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { headers });
     const url = new URL(request.url);
     if (url.pathname === "/health") {
-      return new Response(JSON.stringify({ status: "ok", chunks: CHUNKS.length }), { headers });
+      return new Response(JSON.stringify({
+        status: "ok",
+        chunks: CHUNKS.length,
+        version: env.CF_VERSION_METADATA?.id || null,
+      }), { headers });
     }
     if (request.method !== "POST" || url.pathname !== "/chat") {
       return new Response(JSON.stringify({ error: "not found" }), { status: 404, headers });

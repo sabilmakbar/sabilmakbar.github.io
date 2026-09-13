@@ -182,9 +182,9 @@ Pushing a change under `profile-qa/worker/` (including the generated
 
 1. **Refuses a stale index.** It runs the data checks first, so it will not ship a
    worker whose `index.json` disagrees with `src/data`.
-2. **Health check after deploying.** It polls `/health` and requires the live chunk
-   count to match the committed index, retrying for about a minute while
-   Cloudflare propagates.
+2. **Health check after deploying.** It polls `/health` and requires both the live
+   Cloudflare version ID and chunk count to match the deployment, retrying for
+   about a minute while Cloudflare propagates.
 3. **Automatic rollback.** If the deploy succeeded but the health check failed, it
    rolls back to the version that was live before. It records that version id
    *before* deploying, and the rollback step only runs when the deploy itself

@@ -79,7 +79,12 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # avoids a /memberships lookup, which the token is not scoped for
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx wrangler deploy
+        run: |
+          set -o pipefail
+          npx wrangler deploy | tee "$RUNNER_TEMP/wrangler-deploy.log"
+          VERSION=$(sed -n 's/.*Current Version ID: //p' "$RUNNER_TEMP/wrangler-deploy.log" | tail -1)
+          [ -n "$VERSION" ] || { echo "::error::Wrangler did not report a version ID"; exit 1; }
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       # Fail-safe 3: prove the new version actually serves the expected index.
       # Cloudflare needs a moment to propagate, so retry before giving up.
@@ -87,6 +92,7 @@ jobs:
         if: steps.guard.outputs.skip != 'true'
         run: |
           EXPECTED=$(node -e "console.log(require('./profile-qa/worker/src/index.json').length)")
+          EXPECTED_VERSION="${{ steps.deploy.outputs.version }}"
           # Guard against an empty value, otherwise "" = "" would look healthy.
           case "$EXPECTED" in
             ''|*[!0-9]*) echo "::error::Could not read the chunk count"; exit 1 ;;
@@ -101,12 +107,16 @@ jobs:
               let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{
                 try { console.log(JSON.parse(d).chunks) } catch { console.log('') }
               })")
-            if [ -n "$ACTUAL" ] && [ "$ACTUAL" = "$EXPECTED" ]; then
-              echo "healthy: $ACTUAL chunks live"
+            ACTUAL_VERSION=$(printf '%s' "$BODY" | node -e "
+              let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{
+                try { console.log(JSON.parse(d).version) } catch { console.log('') }
+              })")
+            if [ -n "$ACTUAL" ] && [ "$ACTUAL" = "$EXPECTED" ] && [ "$ACTUAL_VERSION" = "$EXPECTED_VERSION" ]; then
+              echo "healthy: $ACTUAL chunks live on version $ACTUAL_VERSION"
               exit 0
             fi
           done
-          echo "::error::Health check failed. Expected $EXPECTED chunks."
+          echo "::error::Health check failed. Expected $EXPECTED chunks on version $EXPECTED_VERSION."
           exit 1
 
       # Only rolls back when the deploy itself succeeded but a later check failed,

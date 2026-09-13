@@ -45,6 +45,7 @@ function makeEnv(overrides: any = {}) {
       },
     },
     DB: null, // no database: logging and rate limiting fail open
+    CF_VERSION_METADATA: { id: "test-version" },
     ...overrides,
   };
 }
@@ -117,6 +118,7 @@ describe("health endpoint", () => {
     assert.equal(body.status, "ok");
     // CI compares this against the committed index, so it must be the real count
     assert.equal(body.chunks, chunkCount);
+    assert.equal(body.version, "test-version");
   });
 });
 
