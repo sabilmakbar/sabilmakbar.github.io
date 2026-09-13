@@ -30,12 +30,14 @@ page and the widget.
 - `profile-qa/worker/src/index.json` — the chatbot's search index. **Generated, do not edit by hand.**
 - `profile-qa/scripts/build-index.ts` — generates that index from `src/data`.
 - `profile-qa/backend/` — legacy Python prototype, retired. Kept for reference only; not used.
-- `.github/workflows/deploy.yml` — builds the site and deploys it.
+- `.github/workflows/deploy.yml` — tests, builds, and deploys the site through
+  GitHub Pages artifacts.
+- `.github/workflows/deploy-worker.yml` — verifies and deploys QA worker changes,
+  then checks health and rolls back a bad deployment when possible.
 
 ## Branches
 
 - `master` — source of truth. Pushing here triggers a build + deploy.
-- `gh-pages` — the built output GitHub Pages actually serves. Written by CI, never edit directly.
 - `al-folio-legacy` — the old Jekyll (al-folio) site, preserved.
 
 ## Data model (single source of truth)
@@ -68,9 +70,9 @@ See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for the full step-by-step
 (requirements, local dev, building, updating content, and deploying both the
 site and the worker).
 
-Rule of thumb: after any `src/data` edit that touches CV, profile, or
-publications, run `npm run build:index` and redeploy the worker so the chatbot
-stays in sync with the site.
+Rule of thumb: after any `src/data` edit, run `npm run build:index`, commit the
+generated index, and push. The worker deployment workflow keeps the live chatbot
+in sync with the site.
 
 `npm test` (Node's built-in runner, no framework installed) enforces that rule
 and the privacy rules below: it fails if the QA index is stale, if a phone number
@@ -88,6 +90,9 @@ Tests live in `tests/`.
   returned to users as answer context. Redaction works only by keeping private
   data out of `src/data` in the first place, which is why the index is generated
   from the structured data and nothing else.
+- Public repository READMEs are rendered on project pages, but are intentionally
+  excluded from the QA index. Only curated profile data in `src/data` can become
+  chatbot context.
 - The worker's CORS is locked to the site origin plus localhost.
 
 ## Typography

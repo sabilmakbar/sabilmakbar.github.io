@@ -6,7 +6,8 @@ architecture and data model, see [CLAUDE.md](./CLAUDE.md).
 The repo has two deployable parts:
 
 - the **site** (Astro), deployed to GitHub Pages by GitHub Actions, and
-- the **QA worker** (Cloudflare Worker), deployed manually with wrangler.
+- the **QA worker** (Cloudflare Worker), deployed by its own GitHub Actions
+  workflow, with wrangler available as a manual fallback.
 
 ---
 
@@ -135,9 +136,9 @@ index if you touched CV, profile, or publications.
 | Publications | `src/data/publications.ts` | `npm run build:index` |
 | Profile links / tagline / nav | `src/data/profile.ts` | `npm run build:index` |
 | About bio, tech stack, interests | `src/data/about.ts` | `npm run build:index` |
-| Teaching, talks, activities | `src/pages/activities.astro` | nothing |
+| Teaching, talks, activities | `src/data/activities.ts` | `npm run build:index` |
 | Blog post | add/edit Markdown in `src/content/blog/` | nothing |
-| Featured repos | `FEATURED` in `src/pages/repositories.astro` | nothing |
+| Featured repos | `FEATURED` in `src/lib/github.ts` | nothing |
 
 Blog posts are Markdown with frontmatter (`title`, `date`, `summary`, `tags`,
 optional `repo`, `draft`). Set `draft: true` to keep one unpublished; when no
@@ -147,8 +148,9 @@ posts are published, `/blog` shows a "coming soon" page automatically.
 npm run build:index    # regenerates profile-qa/worker/src/index.json from src/data
 ```
 
-After running `build:index`, redeploy the worker (step 6) so the chatbot serves
-the updated index. Do not edit `index.json` by hand; it is generated.
+After running `build:index`, commit the generated index and push it. The worker
+workflow in step 6 deploys it automatically. Do not edit `index.json` by hand;
+it is generated.
 
 **Privacy reminder:** never put phone numbers, home address, or absolute financial
 figures into `src/data`. Anything in `src/data` can appear on the site and in
@@ -160,8 +162,8 @@ chatbot answers. See the privacy rules in [CLAUDE.md](./CLAUDE.md).
 
 ### Site (automatic)
 
-Push to `master`. GitHub Actions builds the site and publishes it to the
-`gh-pages` branch, which GitHub Pages serves.
+Push to `master`. GitHub Actions tests and builds the site, uploads `dist/` as a
+Pages artifact, and deploys it with GitHub's official Pages actions.
 
 ```bash
 git add -A
@@ -196,7 +198,10 @@ One-time setup:
 1. In Cloudflare, create an API token using the **Edit Cloudflare Workers**
    template, and add **D1: Edit** for the same account (the worker has a D1
    binding).
-2. Add it to GitHub as a secret named `CLOUDFLARE_API_TOKEN`.
+2. Copy the Cloudflare account ID from the Workers dashboard overview.
+3. Add both values to the GitHub repository under **Settings > Secrets and
+   variables > Actions** as `CLOUDFLARE_API_TOKEN` and
+   `CLOUDFLARE_ACCOUNT_ID`.
 
 ### QA worker (manual)
 
@@ -223,6 +228,7 @@ Verify the deploy:
 
 ```bash
 curl -s -X POST https://profile-qa-cf.maulana-1998.workers.dev/chat \
+  -H "Origin: https://sabilmakbar.github.io" \
   -H "Content-Type: application/json" \
   -d '{"question":"Where does Sabil currently work?"}'
 ```
@@ -292,9 +298,11 @@ Cloudflare Web Analytics sets no cookies and does not track visitors across site
 - **GitHub Actions:** `GITHUB_TOKEN` is provided automatically by Actions; no
   setup needed. It only raises the GitHub API rate limit during the build.
 - **Local dev:** optionally set `GITHUB_TOKEN` in your shell (step 3).
-- **Cloudflare:** wrangler auth via `npx wrangler login` or `CLOUDFLARE_API_TOKEN`
-  (step 2). To automate worker deploys in CI later, add `CLOUDFLARE_API_TOKEN` as
-  a GitHub Actions secret and add a wrangler deploy step to the workflow.
+- **Cloudflare worker deploy:** add `CLOUDFLARE_API_TOKEN` and
+  `CLOUDFLARE_ACCOUNT_ID` as GitHub Actions secrets (step 6). For a manual
+  deployment, authenticate with `npx wrangler login` or set both values in the
+  shell.
+- **Cloudflare Web Analytics:** optionally add `CF_ANALYTICS_TOKEN` (step 6d).
 
 ---
 
@@ -306,6 +314,6 @@ Cloudflare Web Analytics sets no cookies and does not track visitors across site
 | `node: command not found` | Node is not on your PATH. Install or activate Node 22+ (on the author's machine: `conda activate node`). |
 | `Tsconfig not found` on `npx astro build` | You ran a stray global Astro. Use `npm run build` so the project's local Astro is used. |
 | Empty personal-projects grid locally | GitHub API rate limit. Set `GITHUB_TOKEN` before `npm run dev`. |
-| Chatbot answers with stale info | You edited `src/data` but did not re-index or redeploy. Run `npm run build:index`, then `npx wrangler deploy` in `profile-qa/worker`. |
+| Chatbot answers with stale info | You edited `src/data` but did not update the deployed index. Run `npm run build:index`, commit the generated file, and push. If Actions is unavailable, run `npx wrangler deploy` in `profile-qa/worker`. |
 | Chat widget fails locally ("couldn't reach the assistant") | Your dev origin is not in `ALLOWED_ORIGINS`. The worker allows `http://localhost:4321` (Astro's default port); if you run the dev server on another port, add that origin in `profile-qa/worker/wrangler.toml` and redeploy. |
 | `build:index` fails on a TypeScript error | Ensure Node is 22.12+; older Node lacks `--experimental-strip-types`. |
