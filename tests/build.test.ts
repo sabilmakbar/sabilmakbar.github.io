@@ -54,7 +54,9 @@ describe("built site", () => {
   test("repository cards lead to generated project pages", () => {
     const html = readFileSync(join(dist, "repositories/index.html"), "utf8");
     const projectLinks = [...html.matchAll(/href="(\/projects\/[^"#?]+\/)"/g)].map((match) => match[1]);
+    const githubCardLinks = [...html.matchAll(/aria-label="View [^"]+ on GitHub"/g)];
     assert.ok(projectLinks.length >= 4, "expected project links for the featured repositories");
+    assert.equal(githubCardLinks.length, projectLinks.length, "each card needs a separate GitHub link");
     for (const href of new Set(projectLinks)) {
       assert.ok(existsSync(join(dist, href.replace(/^\//, ""), "index.html")), `missing project page: ${href}`);
     }
