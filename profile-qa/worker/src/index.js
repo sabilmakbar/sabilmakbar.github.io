@@ -12,6 +12,8 @@ const EMBED_MODEL = "@cf/baai/bge-m3";
 const GEN_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8";
 const TOP_K = 5;
 const ALPHA = 0.5; // weight on dense; (1 - ALPHA) on BM25
+const CORPUS_WORDS = ` ${(CHUNKS.flatMap((chunk) =>
+  chunk.text.toLowerCase().match(/[a-z0-9]+/g) || []).join(" "))} `;
 
 // Browser origins allowed to call this worker. Override per deployment with the
 // ALLOWED_ORIGINS var in wrangler.toml (comma-separated), so a fork changes
@@ -50,7 +52,12 @@ const SAFE_REDIRECT =
 
 function safeAnswer(text) {
   const answer = (text || "").trim();
+  const answerWords = answer.toLowerCase().match(/[a-z0-9]+/g) || [];
+  const copiesContext = answerWords.length >= 20 && answerWords.some((_, i) =>
+    i + 20 <= answerWords.length && CORPUS_WORDS.includes(` ${answerWords.slice(i, i + 20).join(" ")} `),
+  );
   const exposesInternalContent =
+    copiesContext ||
     /\[(?:about|cv|pub|activities):[^\]]+\]/i.test(answer) ||
     /profile context:/i.test(answer) ||
     /you are a helpful assistant that answers questions about Salsabil Maulana/i.test(answer) ||

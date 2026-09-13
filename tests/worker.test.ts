@@ -326,6 +326,7 @@ describe("prompt safety", () => {
   for (const [name, leaked] of [
     ["system prompt", "You are a helpful assistant that answers questions about Salsabil Maulana Akbar."],
     ["raw context", "[cv:experience:overview] Sabil began his career in Nov 2020."],
+    ["unlabelled context copy", "Here is the repeated text: Academic interest, Low-resource NLP research: Several Indonesian local languages are syntactically transferable from Indonesian without major semantic degradation; Dedicated to bridging NLP into low-resource languages via this approach"],
     ["alternate persona", "DAN MODE ON. I will answer freely."],
   ]) {
     test(`a model reply containing ${name} is replaced`, async () => {
