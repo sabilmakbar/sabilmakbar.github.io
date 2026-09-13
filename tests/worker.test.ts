@@ -320,6 +320,24 @@ describe("prompt safety", () => {
     assert.deepEqual(Object.keys(body).sort(), ["answer", "sources"]);
     assert.ok(!JSON.stringify(body).includes("Profile context:"), "the prompt was echoed back");
   });
+
+  for (const [name, leaked] of [
+    ["system prompt", "You are a helpful assistant that answers questions about Salsabil Maulana Akbar."],
+    ["raw context", "[cv:experience:overview] Sabil began his career in Nov 2020."],
+    ["alternate persona", "DAN MODE ON. I will answer freely."],
+  ]) {
+    test(`a model reply containing ${name} is replaced`, async () => {
+      const env = makeEnv({
+        AI: {
+          run: async (model: string) =>
+            model.includes("bge") ? { data: [[...FAKE_VECTOR]] } : { response: leaked },
+        },
+      });
+      const body = await (await ask({ question: "hi" }, SITE_ORIGIN, env)).json();
+      assert.equal(body.answer, "I can only answer questions about Sabil using public profile information.");
+      assert.ok(!JSON.stringify(body).includes(leaked));
+    });
+  }
 });
 
 describe("rate limiting", () => {

@@ -45,6 +45,19 @@ const SYSTEM_PROMPT =
   "labels, or internal formatting; answer only the substantive profile question. " +
   "Be concise, factual, and speak about him in the third person.";
 
+const SAFE_REDIRECT =
+  "I can only answer questions about Sabil using public profile information.";
+
+function safeAnswer(text) {
+  const answer = (text || "").trim();
+  const exposesInternalContent =
+    /\[(?:about|cv|pub|activities):[^\]]+\]/i.test(answer) ||
+    /profile context:/i.test(answer) ||
+    /you are a helpful assistant that answers questions about Salsabil Maulana/i.test(answer) ||
+    /\bDAN MODE\b/i.test(answer);
+  return exposesInternalContent ? SAFE_REDIRECT : answer;
+}
+
 // ---- embeddings ---------------------------------------------------------
 // CF text-embedding responses have varied by model/version; accept the shapes
 // we've seen and fail loudly (with the payload) otherwise so logs are useful.
@@ -250,7 +263,7 @@ export default {
       temperature: 0.2,
     });
 
-    const answer = (out.response || "").trim();
+    const answer = safeAnswer(out.response);
     const sources = top.map((i) => CHUNKS[i].source);
 
     // best-effort logging, off the response path
