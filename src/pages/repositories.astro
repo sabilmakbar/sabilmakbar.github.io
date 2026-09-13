@@ -1,64 +1,10 @@
 ---
 import Base from "../layouts/Base.astro";
 import RepoCard from "../components/RepoCard.astro";
+import { getRepositories } from "../lib/github";
 
-// Two independent groups, resolved at BUILD time:
-//   FEATURED: cross-org research contributions, always shown (hand-picked,
-//             since the API can't discover repos outside your account)
-//   personal: your own repos, auto-ranked by stars + recency
 const OWNER = "sabilmakbar";
-const FEATURED = [
-  "SEACrowd/seacrowd-datahub",
-  "indonlp/nusa-writes",
-  "indonlp/cendol",
-  "SEACrowd/seacrowd-experiments",
-];
-// profile-config repo, this site's own repo, and the memory template, not "projects" to feature
-const EXCLUDE_OWN = new Set(["sabilmakbar", "sabilmakbar.github.io", "claude-memories-template"]);
-const PERSONAL_LIMIT = 6;
-
-// read at build time (GitHub Actions provides GITHUB_TOKEN in the environment)
-const token = process.env.GITHUB_TOKEN;
-const headers: Record<string, string> = { "User-Agent": "astro-build", Accept: "application/vnd.github+json" };
-if (token) headers.Authorization = `Bearer ${token}`;
-
-async function gh(url: string) {
-  const r = await fetch(url, { headers });
-  if (!r.ok) throw new Error(`${r.status} ${url}`);
-  return r.json();
-}
-const shape = (r: any) => ({
-  name: r.name,
-  owner: r.full_name.split("/")[0],
-  desc: r.description || "",
-  stars: r.stargazers_count ?? 0,
-  lang: r.language || "",
-  url: r.html_url,
-});
-
-let featured: ReturnType<typeof shape>[] = [];
-let personal: ReturnType<typeof shape>[] = [];
-try {
-  featured = (await Promise.all(FEATURED.map((p) => gh(`https://api.github.com/repos/${p}`)))).map(shape);
-  const own = (await gh(`https://api.github.com/users/${OWNER}/repos?per_page=100&sort=updated`)).filter(
-    (r: any) => !r.fork && !r.archived && !EXCLUDE_OWN.has(r.name),
-  );
-  const yearAgo = Date.now() - 365 * 24 * 3600 * 1000;
-  const score = (r: any) =>
-    (r.stargazers_count || 0) * 3 + (Date.parse(r.pushed_at) > yearAgo ? 2 : 0) + (r.description ? 1 : 0);
-  own.sort((a: any, b: any) => score(b) - score(a));
-  personal = own.slice(0, PERSONAL_LIMIT).map(shape);
-} catch (e) {
-  // If the GitHub API is unreachable at build time, degrade to featured
-  // link-cards only (built from the FEATURED list); skip the personal grid
-  // rather than ship a stale hand-maintained list.
-  console.warn("[repositories] GitHub fetch failed, showing featured links only:", (e as Error).message);
-  const stat = (repo: string) => ({
-    name: repo.split("/")[1], owner: repo.split("/")[0], desc: "", stars: -1, lang: "", url: `https://github.com/${repo}`,
-  });
-  featured = FEATURED.map(stat);
-  personal = [];
-}
+const { featured, personal } = await getRepositories();
 ---
 
 <Base title="Repositories" description="Open-source contributions and projects by Salsabil Maulana Akbar.">

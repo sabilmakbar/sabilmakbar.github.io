@@ -51,6 +51,15 @@ describe("built site", () => {
     assert.deepEqual(broken, [], "broken internal links");
   });
 
+  test("repository cards lead to generated project pages", () => {
+    const html = readFileSync(join(dist, "repositories/index.html"), "utf8");
+    const projectLinks = [...html.matchAll(/href="(\/projects\/[^"#?]+\/)"/g)].map((match) => match[1]);
+    assert.ok(projectLinks.length >= 4, "expected project links for the featured repositories");
+    for (const href of new Set(projectLinks)) {
+      assert.ok(existsSync(join(dist, href.replace(/^\//, ""), "index.html")), `missing project page: ${href}`);
+    }
+  });
+
   test("every image and asset reference resolves", () => {
     const broken: string[] = [];
     for (const file of htmlFiles(dist)) {
@@ -139,7 +148,11 @@ describe("built site", () => {
       const text = readFileSync(file, "utf8")
         .replace(/<[^>]*>/g, " ") // drop markup, incl. SVG path coordinates
         .replace(/https?:\/\/\S+/g, " ");
-      assert.ok(!PHONE.test(text), `phone-like string in ${file.replace(dist, "dist")}`);
+      const matches = [...text.matchAll(new RegExp(PHONE, "g"))]
+        .map((match) => match[0].trim())
+        // Publication IDs and BibTeX page ranges are common in project READMEs.
+        .filter((match) => !/^\d{4}\.\d{4,5}$/.test(match) && !match.includes("--"));
+      assert.deepEqual(matches, [], `phone-like string in ${file.replace(dist, "dist")}`);
     }
   });
 

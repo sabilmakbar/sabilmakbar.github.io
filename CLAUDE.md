@@ -19,6 +19,7 @@ runs on free, open-source infrastructure.
 - `/` — landing page with an ask box that answers inline.
 - `/about` — the profile (bio, core experience, tech stack, selected publications).
 - `/blog` — posts; shows a "coming soon" state when nothing is published.
+- `/projects/<repo>` — build-time snapshots of selected public GitHub READMEs.
 - `/publications`, `/repositories`, `/cv`, `/activities`.
 
 The site uses Astro view transitions (`<ClientRouter />`), and the chat widget is
@@ -49,7 +50,9 @@ All content lives in `src/data/`:
 
 The Repositories page fetches the repo list live from GitHub at build time; there
 is no committed repo data. Featured cross-org repos are hand-picked in the
-`FEATURED` constant in `src/pages/repositories.astro`.
+`FEATURED` constant in `src/lib/github.ts`. Each selected repository also gets a
+project page whose README is rendered by GitHub during the build. If that fetch
+fails, the page falls back to the repository description and GitHub link.
 
 Both consumers read these same files:
 

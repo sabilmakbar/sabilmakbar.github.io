@@ -14,6 +14,7 @@ import { about, taglines } from "../src/data/about.ts";
 import { education, experience, awards, projects } from "../src/data/cv.ts";
 import { publications } from "../src/data/publications.ts";
 import { teaching } from "../src/data/activities.ts";
+import { cleanReadmeHtml } from "../src/lib/github.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const INDEX = join(root, "profile-qa/worker/src/index.json");
@@ -318,5 +319,10 @@ describe("teaching", () => {
 describe("projects", () => {
   test("project links are absolute https", () => {
     for (const p of projects) assert.match(p.href, /^https:\/\//, `bad url: ${p.title}`);
+  });
+
+  test("expiring GitHub README images are removed", () => {
+    const signed = '<a href="https://private-user-images.githubusercontent.com/1/image.png?jwt=short"><img src="https://private-user-images.githubusercontent.com/1/image.png?jwt=short"></a>';
+    assert.equal(cleanReadmeHtml(`<p>Before</p>${signed}<p>After</p>`), "<p>Before</p><p>After</p>");
   });
 });
