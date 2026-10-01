@@ -2,7 +2,7 @@
 // index (build-index.ts) draw from the same source.
 // Phrases the hero tagline cycles through. First one is the static fallback.
 export const taglines = [
-  "AI & Machine Learning Engineer",
+  "AI/ML Engineer · Speech AI · NLP · Information Retrieval",
   "NLP · Speech · Information Retrieval",
   "Turning data into production AI systems",
   "Applied mathematics, in production",
@@ -10,11 +10,11 @@ export const taglines = [
 
 export const about = {
   summary:
-    "AI professional with ~5 years of experience in Data Science & Machine Learning, applying a strong mathematics foundation to deliver end-to-end AI solutions across NLP, Speech, Computer Vision, and Tabular domains. Experienced in both startups and multinational corporations.",
+    "AI/ML Engineer with 6 years of experience building production systems across Speech, NLP and Information Retrieval, Computer Vision, and Tabular ML. Experienced across the ML lifecycle, from research and experimentation to data pipelines, model optimization, deployment, and observability.",
   coreExperience: [
     {
       label: "Production Systems",
-      text: "Developed pricing models from scratch, improved search relevance, built fraud detection systems, and deployed scalable, long-lasting ML models into production.",
+      text: "Built property valuation models, improved search relevance, and deployed multilingual speech models and scalable ML pipelines into production.",
     },
     {
       label: "Experiment Design & Impact Measurement",
@@ -22,7 +22,7 @@ export const about = {
     },
     {
       label: "Generative AI & Voice",
-      text: "Currently building and fine-tuning Speech & Text models with LLM-RAG integration, alongside pipelines for real-world voice AI applications.",
+      text: "Currently researching, fine-tuning, evaluating, and deploying multilingual ASR and TTS models alongside training and benchmarking platforms for production voice systems.",
     },
     {
       label: "Research",
@@ -40,19 +40,15 @@ export const about = {
   keywords: [
     {
       group: "Voice AI (current role)",
-      items: "Python, LLMs & RAG, vLLM, Speech & audio models, FastAPI, AWS, Docker, Kubernetes, Airflow, DVC",
+      items: "Python, PyTorch, Hugging Face, NeMo, FastAPI, vLLM, Triton, NVIDIA NIM/Riva, LiveKit, AWS, Docker, Kubernetes, DVC, GitHub Actions",
     },
     {
       group: "Search & IR (Tokopedia, TikTok)",
-      items: "Query understanding, retrieval & ranking, Vector Databases, model distillation & quantization, Airflow, GCP",
-    },
-    {
-      group: "Fraud & Risk (fintech startup)",
-      items: "Graph Data Science (Neo4j), anomaly and network analysis, SQL, Airflow",
+      items: "Query understanding, graph embeddings, retrieval & ranking, vector databases, model distillation & quantization, TensorFlow, SQL, Airflow, GCP",
     },
     {
       group: "Proptech (Pashouses)",
-      items: "Multimodal modeling (tabular, text, image), ETL pipelines, GCP",
+      items: "Tabular and geospatial modeling, computer vision, OCR, ETL pipelines, PostgreSQL, GCP",
     },
     {
       group: "Mathematics & teaching",

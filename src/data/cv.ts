@@ -1,51 +1,37 @@
 export const education = [
   {
-    title: "Bachelor of Mathematics",
+    title: "Bachelor of Science in Mathematics, Cum Laude",
     org: "Bandung Institute of Technology (ITB)",
-    year: "2016-2020",
+    location: "Bandung, Indonesia",
+    year: "Aug 2016 - Sep 2020",
     points: [
-      "Thesis: Computational Fluid Dynamics for Wave Propagation using the Shallow Water Equation",
-      "Focus area in Applied Mathematics (Optimization, PDE, Financial Mathematics)",
-      "Core math coursework: Linear Algebra, Real & Complex Analysis, Multivariable Calculus",
-      "Intermediate statistics: Probability Theory, Mathematical Statistics",
-      "Activities: International Mathematical Modeling Competition (fish population dynamics); Quantitative Finance portfolio-construction challenge",
+      "Thesis: Computational Fluid Dynamics of Wave Propagation using Shallow Water Equations",
+      "Relevant coursework: Computational Mathematics, Mathematical Optimization, Mathematical Statistics, Probability Theory",
     ],
   },
 ];
 
 export const experience = [
   {
-    title: "AI Engineer (Research)",
+    title: "ML Research Engineer",
     org: "Stealth AI Startup",
     location: "Kuala Lumpur, Malaysia",
-    year: "Jan 2025 - present",
+    year: "Oct 2024 - present",
     points: [
-      "Fine-tuned cross-domain Speech & Text models with LLM-RAG integration for Voice Assistants, substantially reducing error rates against open-source baselines for APAC and MENA languages",
-      "Engineered and deployed high-throughput, low-latency audio pipeline modules (Transcription, LID, VAD, Emotion Detection, Audio Spectrogram Transformers), optimizing inference for scalable production Voice Agent frameworks",
-      "Overhauled Active Learning pipelines using LLM-assisted auto-labeling and human-in-the-loop verification, scaling up dataset coverage and annotation accuracy",
-      "Built end-to-end data and training automation loops, leveraging DVC and GitHub Actions for event-triggered CI/CD orchestration and rapid, reproducible ML experimentation",
+      "Researched, fine-tuned, and deployed multilingual ASR and TTS models for production Speech AI across APAC and MENA languages, improving quality against strong open-source baselines",
+      "Built an internal speech-model benchmarking platform for hosted and local models across WER, CER, MOS, RTF, throughput, and GPU utilization",
+      "Evaluated and integrated denoising, LID, VAD, and turn detection into LiveKit-based voice systems",
+      "Built an internal speech-model training platform spanning data versioning, training, resource allocation, evaluation, and benchmarking; co-developed an LLM-as-a-Judge pipeline for multi-ASR auto-labeling and human-in-the-loop routing",
     ],
   },
   {
-    title: "Data Scientist",
-    org: "Stealth Startup",
-    location: "Remote",
-    year: "Sep 2024 - Dec 2024",
-    points: [
-      "Detected and tackled fraudulent activity, reducing customer complaints and averting recurring monthly losses",
-      "Reviewed fraud networks from past cases using Graph DS and historical activity, including churn on complaints",
-      "Explored LLM and agentic workflows for internal fraud-detection tooling",
-      "Built data-driven alerting for risk prevention and mitigation (in-app loopholes, catastrophic alerting)",
-    ],
-  },
-  {
-    title: "Algorithm/AI Engineer",
+    title: "Algorithm Engineer",
     org: "TikTok",
     location: "Jakarta, Indonesia",
     year: "Feb 2024 - Jul 2024",
     points: [
-      "Harmonized cross-platform search algorithms and system architectures between Tokopedia and TikTok Shop post-acquisition, fine-tuning retrieval models with local marketplace nuances to lift search relevance",
-      "Spearheaded core phases of TikTok's end-to-end ML lifecycle, designing and scaling pipelines for data streaming, automated model training, search indexing, and high-dimensional Vector DB infrastructure",
+      "Harmonized search and retrieval systems across Tokopedia and TikTok Shop after the acquisition, adapting models to Indonesian marketplace data, taxonomy, and user behavior; developed a graph-embedding retrieval approach that improved search relevance and conversion",
+      "Migrated search use cases to TikTok's production ML platform, validating cross-platform data integrity and adapting workflows for automated training, embedding generation, vector-index updates, and retrieval indexing",
     ],
   },
   {
@@ -54,9 +40,9 @@ export const experience = [
     location: "Jakarta, Indonesia",
     year: "Sep 2021 - Jul 2024",
     points: [
-      "Architected Query Understanding algorithms for Search Personalization, lifting search relevance, conversion, gross transaction value, and monthly ads revenue",
-      "Engineered a multi-label Query-to-Product Type assortment system for IR pre-filtering, driving gains in conversions, transaction value, and monthly ads revenue",
-      "Scaled deep learning and LLM solutions in production (real-time classifiers, LLM automated labelers), leveraging model distillation and quantization to cut latency and compute cost while holding baseline accuracy",
+      "Led Query Understanding for search personalization, combining query semantics and behavioral signals to model intent, attributes, and browse-versus-buy behavior, improving relevance, conversion, and transaction value",
+      "Co-developed a multi-label deep-learning query classifier over the product-category taxonomy for pre-retrieval and coarse-to-fine ranking",
+      "Optimized query classification for production through model distillation and quantization, reducing latency while retaining baseline performance and integrating with existing inference platforms",
     ],
   },
   {
@@ -65,8 +51,8 @@ export const experience = [
     location: "Jakarta, Indonesia",
     year: "Nov 2020 - Sep 2021",
     points: [
-      "Engineered a multi-modal Automated Valuation Model (AVM) for regional housing prices using tabular, text, and image data, keeping the error rate low while greatly accelerating processing throughput",
-      "Designed end-to-end data engineering and ETL pipelines for property analytics, cutting manual data ingestion effort while keeping the system reliable",
+      "Built and deployed an Automated Valuation Model for residential properties in Greater Jakarta, combining tabular and geospatial data with computer-vision-derived property-condition scores",
+      "Built computer-vision and data-processing workflows for property collection, including visual listing deduplication, OCR-based geolocation extraction, and automated ingestion and feature pipelines",
     ],
   },
 ];

@@ -3,7 +3,7 @@ export const profile = {
   short: "Sabil",
   brand: "Salsabil Maulana Akbar",   // nav wordmark
   brandTag: "AI & ML Engineer",
-  tagline: "AI & Machine Learning Engineer",
+  tagline: "AI/ML Engineer · Speech AI · NLP · Information Retrieval",
   location: "Kuala Lumpur, Malaysia",
   email: "maulana.1998@yahoo.co.id",
   avatar: "/img/profile.png",
@@ -16,9 +16,9 @@ export const profile = {
   socialDescription:
     "AI & ML Engineer in NLP, Speech, and Information Retrieval. Ask this site anything about my background.",
   blurb:
-    "AI professional with ~5 years of experience in Data Science & Machine Learning, applying a strong " +
-    "mathematics foundation to deliver end-to-end AI solutions across NLP, Speech, Computer Vision, and " +
-    "Tabular domains. Experienced in both startups and multinational corporations.",
+    "AI/ML Engineer with 6 years of experience building production systems across Speech, NLP and Information " +
+    "Retrieval, Computer Vision, and Tabular ML. Experienced across the ML lifecycle, from research and " +
+    "experimentation to data pipelines, model optimization, deployment, and observability.",
   social: [
     { label: "GitHub", href: "https://github.com/sabilmakbar", icon: "github" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/salsabil-maulana-akbar/", icon: "linkedin" },
